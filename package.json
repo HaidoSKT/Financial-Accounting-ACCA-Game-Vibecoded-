@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "test": "node -e \"require('./js/fifo-lifo-engine.js'); console.log('Engine OK');\""
+    "test": "node test/verify.js"
   },
   "keywords": [
     "acca",

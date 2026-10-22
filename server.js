@@ -3,7 +3,7 @@
  * Built with Node.js standard libraries (zero npm dependencies required).
  * Provides HTTP static file serving and REST persistence API for:
  * 1. ACCA Financial Accounting Master (FFA / FA)
- * 2. FIFO vs LIFO Master: Perpetual & Periodic Inventory Simulator
+ * 2. FIFO vs AVCO Master: Perpetual & Periodic Inventory Simulator (IAS 2 Compliant)
  */
 
 const http = require('http');
@@ -159,7 +159,7 @@ const server = http.createServer((req, res) => {
   let targetFile = pathname;
   if (pathname === '/') {
     targetFile = 'index.html';
-  } else if (pathname === '/fifo-lifo' || pathname === '/inventory' || pathname === '/lifo-fifo') {
+  } else if (pathname === '/fifo-avco' || pathname === '/fifo-lifo' || pathname === '/inventory' || pathname === '/avco-fifo' || pathname === '/lifo-fifo') {
     targetFile = 'fifo-lifo.html';
   }
 

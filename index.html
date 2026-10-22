@@ -6,6 +6,16 @@
   <title>ACCA Financial Accounting Master (FFA / FA) - Interactive Simulator & Game</title>
   <link rel="stylesheet" href="css/styles.css">
   <meta name="description" content="ACCA Financial Accounting interactive educational game with persistent data storage, double-entry simulator, trial balance detective, and financial statements architect.">
+  <!-- Modern Web Guidance: Color-scheme declaration and FOUC prevention (default: light) -->
+  <meta name="color-scheme" content="light">
+  <script>
+    (function () {
+      const theme = localStorage.getItem('acca_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+      const meta = document.querySelector('meta[name="color-scheme"]');
+      if (meta) meta.content = theme;
+    })();
+  </script>
 </head>
 <body>
 
@@ -22,8 +32,8 @@
 
       <!-- Live Player Stats HUD -->
       <div class="hud-bar">
-        <a href="fifo-lifo.html" class="hud-btn" style="background:rgba(2, 132, 199, 0.25); border-color:#38bdf8; color:#38bdf8; text-decoration:none;" title="Play FIFO vs LIFO Master: Perpetual & Periodic Simulator">
-          📦 FIFO/LIFO Game
+        <a href="fifo-lifo.html" class="hud-btn" style="text-decoration:none; color:var(--debit-color); border-color:var(--debit-border); background:var(--debit-bg);" title="Play FIFO vs AVCO Master: Perpetual & Periodic Inventory Simulator">
+          📦 FIFO vs AVCO Game
         </a>
 
         <div class="hud-pill xp-pill" title="Player Level & Progression">
@@ -31,7 +41,7 @@
           <div>
             <div style="display:flex; justify-content:space-between; gap:0.5rem; font-size:0.75rem;">
               <span id="hud-level">Lvl 1</span>
-              <span id="hud-xp" style="color:#60a5fa;">0 XP</span>
+              <span id="hud-xp" style="color:var(--debit-color);">0 XP</span>
             </div>
             <div id="hud-player-title" style="font-size:0.65rem; color:var(--text-muted); font-weight:normal;">Trainee Bookkeeper</div>
           </div>
@@ -48,6 +58,10 @@
           <span>🔥</span>
           <span class="hud-value" id="hud-streak">0x</span>
         </div>
+
+        <button id="btn-theme-toggle" class="hud-btn theme-toggle-btn" title="Switch Theme (Light / Dark)" aria-label="Toggle light or dark theme">
+          ☀️ Light
+        </button>
 
         <button id="btn-sound-toggle" class="hud-btn" title="Toggle Synthesized Audio">
           🔊 Sound: ON
@@ -87,6 +101,15 @@
     </button>
     <button class="nav-tab-btn" data-tab="blitz">
       <span>🛡️</span> 6. Exam Trap Blitz
+    </button>
+    <button class="nav-tab-btn" data-tab="ppe">
+      <span>🏛️</span> 7. Chapter 8: PPE & Depreciation
+    </button>
+    <button class="nav-tab-btn" data-tab="accruals">
+      <span>⏳</span> 8. Accruals & Prepayments
+    </button>
+    <button class="nav-tab-btn" data-tab="debts">
+      <span>🛡️</span> 9. Irrecoverable Debts & Allowances
     </button>
   </nav>
 
@@ -193,7 +216,7 @@
 
         <!-- Interactive Balancing Challenge Inputs -->
         <div style="background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.25rem; margin-bottom:1.5rem;">
-          <h3 style="font-size:1rem; font-weight:700; margin-bottom:1rem; color:#93c5fd;">Balancing Off Workings:</h3>
+          <h3 style="font-size:1rem; font-weight:700; margin-bottom:1rem; color:var(--debit-color);">Balancing Off Workings:</h3>
           
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1rem;">
             <div>
@@ -317,7 +340,7 @@
 
           <!-- Right: Interactive Statement Paper -->
           <div class="financial-statement-paper">
-            <h3 style="text-align:center; font-weight:800; font-size:1.15rem; color:#ffffff; margin-bottom:0.25rem;">
+            <h3 style="text-align:center; font-weight:800; font-size:1.15rem; color:var(--text-main); margin-bottom:0.25rem;">
               Statement of Profit or Loss (SPL)
             </h3>
             <p style="text-align:center; font-size:0.75rem; color:var(--text-muted); margin-bottom:1rem;">
@@ -475,6 +498,278 @@
         <div id="blitz-feedback" class="feedback-box"></div>
       </div>
     </section>
+
+    <!-- ============================================================ -->
+    <!-- MODE 7: CHAPTER 8: PPE & DEPRECIATION (IAS 16) -->
+    <!-- ============================================================ -->
+    <section id="section-ppe" class="mode-section">
+      <div class="game-card">
+        <div class="game-card-header">
+          <div>
+            <h2 class="game-card-title"><span>🏛️</span> Chapter 8: Property, Plant & Equipment (IAS 16) & Depreciation</h2>
+            <p class="game-card-subtitle">Master Capital vs Revenue expenditure, Straight-Line & Reducing-Balance depreciation, IAS 16 Revaluations, and Asset Disposals.</p>
+          </div>
+          <div style="display:flex; gap:0.4rem; flex-wrap:wrap;">
+            <button class="hud-btn primary ppe-subtab-btn active" data-subtab="cvr" onclick="window.gameEngine.switchPpeSubtab('cvr')">1. Capital vs Revenue</button>
+            <button class="hud-btn ppe-subtab-btn" data-subtab="dep" onclick="window.gameEngine.switchPpeSubtab('dep')">2. Depreciation & Revaluation</button>
+            <button class="hud-btn ppe-subtab-btn" data-subtab="disp" onclick="window.gameEngine.switchPpeSubtab('disp')">3. Asset Disposal T-Account</button>
+          </div>
+        </div>
+
+        <!-- Subtab 1: Capital vs Revenue Classifier -->
+        <div id="ppe-subview-cvr" class="ppe-subview active">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <span class="hud-pill" id="cvr-counter">Item 1 of 10</span>
+            <span class="hud-pill" style="color:var(--debit-color);">IAS 16 Recognition Criteria</span>
+          </div>
+
+          <div class="scenario-box">
+            <span class="scenario-tag">Expenditure Item to Classify</span>
+            <p id="cvr-item-text" class="scenario-text">Loading item...</p>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem;">
+            <button class="hud-btn" onclick="window.gameEngine.submitCvrChoice('CAPITAL')" style="padding:1.25rem; font-size:1.1rem; justify-content:center; background:rgba(56,189,248,0.1); border-color:#38bdf8; color:#38bdf8;">
+              🏛️ Capital Expenditure<br>
+              <span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted);">(Add to Non-Current Assets - SOFP)</span>
+            </button>
+            <button class="hud-btn" onclick="window.gameEngine.submitCvrChoice('REVENUE')" style="padding:1.25rem; font-size:1.1rem; justify-content:center; background:rgba(244,63,94,0.1); border-color:#fb7185; color:#fb7185;">
+              📑 Revenue Expenditure<br>
+              <span style="font-size:0.75rem; font-weight:normal; color:var(--text-muted);">(Expense to Operating Costs - SPL)</span>
+            </button>
+          </div>
+
+          <div id="cvr-feedback" class="feedback-box"></div>
+          <div style="display:flex; justify-content:flex-end; margin-top:1rem;">
+            <button id="cvr-btn-next" class="hud-btn" onclick="window.gameEngine.nextCvrItem()" style="display:none; padding:0.6rem 1.2rem; background:#10b981; color:#fff;">
+              Next Expenditure Item ➔
+            </button>
+          </div>
+        </div>
+
+        <!-- Subtab 2: Depreciation & Revaluation Lab -->
+        <div id="ppe-subview-dep" class="ppe-subview" style="display:none;">
+          <div style="margin-bottom:1.25rem; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:var(--radius-md); padding:1rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.75rem;">
+              <h3 style="font-size:1.1rem; font-weight:700; color:#fff;">Interactive Depreciation Methods Comparator</h3>
+              <select id="dep-scenario-select" class="hud-pill" onchange="window.gameEngine.loadDepreciationScenario(this.value)">
+                <option value="0">Straight-Line: Industrial Press (Cost £60k, Res £6k, 5 yrs)</option>
+                <option value="1">Reducing Balance: Executive Fleet (Cost £40k, 25% RB)</option>
+                <option value="2">Part-Year Pro-Rata: Warehouse Forklift (Acquired 1 Oct)</option>
+              </select>
+            </div>
+            <div id="dep-scenario-details" style="font-size:0.9rem; line-height:1.6; color:var(--text-muted);">
+              <!-- Details loaded dynamically -->
+            </div>
+          </div>
+
+          <!-- Revaluation Model Section (IAS 16) -->
+          <div style="background:rgba(15,23,42,0.8); border:1px solid #1e3a8a; border-radius:var(--radius-md); padding:1.25rem; margin-top:1.5rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+              <h3 style="font-size:1.05rem; font-weight:700; color:#60a5fa;">🏛️ IAS 16 Revaluation Model & Reserves Transfer Engine</h3>
+              <span class="badge-acca">IAS 16 Standard</span>
+            </div>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
+              Asset: Freehold Headquarters originally purchased for £200,000 (50-yr life). After 10 years (Acc Depn = £40,000, Carrying Amount = £160,000), independent appraisal revalues building to £260,000.
+            </p>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-bottom:1rem;">
+              <div class="hud-pill" style="flex-direction:column; align-items:flex-start; padding:0.75rem;">
+                <span style="font-size:0.75rem; color:var(--text-muted);">Revaluation Surplus (OCI / Equity)</span>
+                <span style="font-size:1.3rem; font-weight:800; color:#34d399; font-family:var(--font-mono);">£100,000</span>
+                <span style="font-size:0.7rem; color:var(--text-dim);">£260k Fair Value − £160k Carrying Amt</span>
+              </div>
+              <div class="hud-pill" style="flex-direction:column; align-items:flex-start; padding:0.75rem;">
+                <span style="font-size:0.75rem; color:var(--text-muted);">Revised Annual Depreciation</span>
+                <span style="font-size:1.3rem; font-weight:800; color:#fb7185; font-family:var(--font-mono);">£6,500 / yr</span>
+                <span style="font-size:0.7rem; color:var(--text-dim);">£260,000 / 40 remaining years</span>
+              </div>
+              <div class="hud-pill" style="flex-direction:column; align-items:flex-start; padding:0.75rem;">
+                <span style="font-size:0.75rem; color:var(--text-muted);">Annual Reserves Transfer</span>
+                <span style="font-size:1.3rem; font-weight:800; color:#fbbf24; font-family:var(--font-mono);">£2,500 / yr</span>
+                <span style="font-size:0.7rem; color:var(--text-dim);">Dr Reval Surplus, Cr Retained Earnings</span>
+              </div>
+            </div>
+            <div style="background:rgba(0,0,0,0.3); border-radius:6px; padding:0.75rem; font-family:var(--font-mono); font-size:0.8rem; line-height:1.6;">
+              <strong style="color:#60a5fa;">Journal Workings:</strong><br>
+              1. Dr Accumulated Depreciation £40,000 | Cr Asset Valuation £40,000 (Eliminate historical depn)<br>
+              2. Dr Asset Valuation £100,000 | Cr Revaluation Surplus £100,000 (Recognize surplus in OCI)<br>
+              3. Annual Depn: Dr Depreciation Expense £6,500 | Cr Accumulated Depreciation £6,500<br>
+              4. Reserves Transfer: Dr Revaluation Surplus £2,500 | Cr Retained Earnings £2,500
+            </div>
+          </div>
+        </div>
+
+        <!-- Subtab 3: Asset Disposal Account -->
+        <div id="ppe-subview-disp" class="ppe-subview" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+            <h3 style="font-size:1.1rem; font-weight:700; color:#fff;">Interactive Asset Disposal Account Balancer</h3>
+            <select id="disp-scenario-select" class="hud-pill" onchange="window.gameEngine.loadDisposalScenario(this.value)">
+              <option value="0">Disposal 1: Delivery Van (Cost £25k, Acc Depn £18k, Cash £8.5k)</option>
+              <option value="1">Disposal 2: Equipment Part-Exchange (Cost £32k, Acc Depn £22k, Trade-in £7.5k)</option>
+            </select>
+          </div>
+
+          <div id="disp-taccount-container" style="background:#090f1d; border:1px solid var(--border); border-radius:var(--radius-md); padding:1.25rem; margin-bottom:1.25rem;">
+            <!-- Populated via JS -->
+          </div>
+
+          <div id="disp-feedback" class="feedback-box"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- MODE 8: ACCRUALS & PREPAYMENTS BALANCER -->
+    <!-- ============================================================ -->
+    <section id="section-accruals" class="mode-section">
+      <div class="game-card">
+        <div class="game-card-header">
+          <div>
+            <h2 class="game-card-title"><span>⏳</span> Accruals & Prepayments Balancer</h2>
+            <p class="game-card-subtitle">Master the matching convention, ledger adjustments, reversing opening entries, and year-end SPL vs SOFP calculations.</p>
+          </div>
+          <span id="accruals-counter" class="hud-pill">Scenario 1 of 3</span>
+        </div>
+
+        <!-- Mnemonic Banner for Accruals & Prepayments -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:1rem; margin-bottom:1.5rem;">
+          <div style="background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.3); border-radius:var(--radius-md); padding:1rem;">
+            <strong style="color:#38bdf8; display:block; margin-bottom:0.3rem;">📤 Prepayments (Paid in Advance)</strong>
+            <p style="font-size:0.8rem; color:var(--text-muted);">
+              Benefits paid for now that relate to future period.<br>
+              <strong>SOFP Status:</strong> Current Asset (DEAD Asset - Debit b/d).<br>
+              <strong>SPL Adjustment:</strong> Deducted from cash paid.
+            </p>
+          </div>
+          <div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); border-radius:var(--radius-md); padding:1rem;">
+            <strong style="color:#fbbf24; display:block; margin-bottom:0.3rem;">📥 Accruals (Owing / Incurred)</strong>
+            <p style="font-size:0.8rem; color:var(--text-muted);">
+              Services consumed this period, not yet billed/paid.<br>
+              <strong>SOFP Status:</strong> Current Liability (CLIC Liability - Credit b/d).<br>
+              <strong>SPL Adjustment:</strong> Added to cash paid.
+            </p>
+          </div>
+        </div>
+
+        <!-- Active Scenario Card -->
+        <div class="scenario-box">
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+            <span class="scenario-tag" id="accruals-account-type">Expense Adjustment</span>
+            <span class="badge-acca" id="accruals-title">Rent Expense</span>
+          </div>
+          <p id="accruals-scenario-text" class="scenario-text" style="font-size:0.95rem; line-height:1.6;">Loading accrual scenario...</p>
+        </div>
+
+        <!-- Interactive T-Account Balancer -->
+        <div id="accruals-taccount-wrapper" style="background:#0a0f1d; border:1px solid var(--border); border-radius:var(--radius-md); padding:1.25rem; margin-bottom:1.5rem;">
+          <!-- T-Account rendered here -->
+        </div>
+
+        <!-- User Answer Inputs -->
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.25rem; margin-bottom:1.5rem;">
+          <h4 style="font-size:0.95rem; font-weight:700; color:#fff; margin-bottom:1rem;">Candidate Period-End Audit Determination:</h4>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; align-items:flex-end;">
+            <div class="form-group" style="margin:0;">
+              <label class="form-label" style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:0.3rem;">Charge to Statement of Profit or Loss (£):</label>
+              <input type="number" id="input-accruals-spl" class="form-input" placeholder="e.g. 7500" style="font-family:var(--font-mono);">
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label class="form-label" style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:0.3rem;">Statement of Financial Position Balance (£):</label>
+              <input type="number" id="input-accruals-sofp" class="form-input" placeholder="e.g. 900" style="font-family:var(--font-mono);">
+            </div>
+            <div>
+              <button class="hud-btn primary" onclick="window.gameEngine.submitAccrualsSolution()" style="width:100%; padding:0.65rem 1rem;">
+                Verify Adjustment
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="accruals-feedback" class="feedback-box"></div>
+        <div style="display:flex; justify-content:flex-end; margin-top:1rem;">
+          <button id="accruals-btn-next" class="hud-btn" onclick="window.gameEngine.nextAccrualsScenario()" style="display:none; padding:0.6rem 1.2rem; background:#10b981; color:#fff;">
+            Next Accruals Scenario ➔
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- MODE 9: IRRECOVERABLE DEBTS & ALLOWANCES (RECEIVABLES) -->
+    <!-- ============================================================ -->
+    <section id="section-debts" class="mode-section">
+      <div class="game-card">
+        <div class="game-card-header">
+          <div>
+            <h2 class="game-card-title"><span>🛡️</span> Irrecoverable Debts & Allowances for Receivables</h2>
+            <p class="game-card-subtitle">Master bad debts written off, debts recovered, specific & general allowances, and net receivables presentation per IFRS 9.</p>
+          </div>
+          <span id="debts-counter" class="hud-pill">Audit Case 1 of 2</span>
+        </div>
+
+        <div class="scenario-box">
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+            <span class="scenario-tag">Year-End Receivables Audit</span>
+            <span class="badge-acca" id="debts-case-title">Case Title</span>
+          </div>
+          <p id="debts-narrative" class="scenario-text" style="font-size:0.95rem; line-height:1.6; white-space:pre-line;">Loading debts case...</p>
+        </div>
+
+        <!-- 2-Step Workings Panel -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.25rem; margin-bottom:1.5rem;">
+          <!-- Step 1: Write-off -->
+          <div style="background:#090e1a; border:1px solid var(--border); border-radius:var(--radius-md); padding:1.25rem;">
+            <h3 style="font-size:0.95rem; font-weight:700; color:#38bdf8; margin-bottom:0.5rem;">Step 1: Write-Off Confirmed Debts</h3>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">Remove irrecoverable balance from sales ledger:</p>
+            <div style="font-size:0.85rem; line-height:1.8; font-family:var(--font-mono);">
+              Gross Receivables: <strong id="debts-calc-gross" style="color:#fff;">£64,000</strong><br>
+              Less: Bad Debt Write-Off: <strong id="debts-calc-writeoff" style="color:#fb7185;">(£4,000)</strong><br>
+              <div style="border-top:1px dashed var(--border); margin:0.3rem 0;"></div>
+              <strong>= Adjusted Receivables:</strong> <strong id="debts-calc-adj" style="color:#34d399;">£60,000</strong>
+            </div>
+          </div>
+
+          <!-- Step 2: Allowance Calculation -->
+          <div style="background:#090e1a; border:1px solid var(--border); border-radius:var(--radius-md); padding:1.25rem;">
+            <h3 style="font-size:0.95rem; font-weight:700; color:#fbbf24; margin-bottom:0.5rem;">Step 2: Allowance for Receivables</h3>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">Calculate required allowance on ADJUSTED receivables:</p>
+            <div style="font-size:0.85rem; line-height:1.8; font-family:var(--font-mono);">
+              Required Closing Allowance: <strong id="debts-calc-req-allowance" style="color:#fbbf24;">£3,000</strong><br>
+              Less: Opening Allowance b/d: <strong id="debts-calc-open-allowance" style="color:#fff;">(£2,500)</strong><br>
+              <div style="border-top:1px dashed var(--border); margin:0.3rem 0;"></div>
+              <strong>= Allowance Adjustment (SPL):</strong> <strong id="debts-calc-allowance-adj" style="color:#fb7185;">£500 Increase</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Verification Questions -->
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.25rem; margin-bottom:1.5rem;">
+          <h4 style="font-size:0.95rem; font-weight:700; color:#fff; margin-bottom:1rem;">Complete Financial Statement Determinations:</h4>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; align-items:flex-end;">
+            <div class="form-group" style="margin:0;">
+              <label class="form-label" style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:0.3rem;">Net Charge / (Credit) to SPL (£):</label>
+              <input type="number" id="input-debts-spl" class="form-input" placeholder="e.g. 4500" style="font-family:var(--font-mono);">
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label class="form-label" style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:0.3rem;">Net Trade Receivables on SOFP (£):</label>
+              <input type="number" id="input-debts-sofp" class="form-input" placeholder="e.g. 57000" style="font-family:var(--font-mono);">
+            </div>
+            <div>
+              <button class="hud-btn primary" onclick="window.gameEngine.submitDebtsSolution()" style="width:100%; padding:0.65rem 1rem;">
+                Audit & Verify Debts
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="debts-feedback" class="feedback-box"></div>
+        <div style="display:flex; justify-content:flex-end; margin-top:1rem;">
+          <button id="debts-btn-next" class="hud-btn" onclick="window.gameEngine.nextDebtsCase()" style="display:none; padding:0.6rem 1.2rem; background:#10b981; color:#fff;">
+            Next Receivables Case ➔
+          </button>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- MODAL: PROFILE & DATA STORAGE (per modern-web-guidance: native dialog with closedby="any") -->
@@ -515,7 +810,7 @@
       </div>
 
       <!-- Badges Unlocked -->
-      <h4 style="font-size:0.95rem; font-weight:800; margin-bottom:0.75rem; color:#f8fafc;">Earned ACCA Badges & Honors</h4>
+      <h4 style="font-size:0.95rem; font-weight:800; margin-bottom:0.75rem; color:var(--text-main);">Earned ACCA Badges & Honors</h4>
       <div id="prof-badges-grid" class="badges-grid" style="margin-bottom:1.5rem;"></div>
 
       <!-- Data Storage & Cloud Management Section -->
@@ -599,6 +894,24 @@
 
       <h4 style="color:#a855f7; font-weight:800; margin-top:1rem; margin-bottom:0.4rem;">4. IAS 2 Inventory Valuation</h4>
       <p>Inventory must be valued at the <strong>lower of cost and net realisable value (NRV)</strong> on an item-by-item basis. NRV = Expected Selling Price − Completion Costs − Selling Expenses.</p>
+
+      <h4 style="color:#38bdf8; font-weight:800; margin-top:1rem; margin-bottom:0.4rem;">5. Chapter 8: Property, Plant & Equipment (IAS 16)</h4>
+      <p>• <strong>Capital vs Revenue:</strong> Capital expenditure enhances/creates PPE (site prep, installation, carriage in, dismantling provision). Revenue expenditure maintains performance (servicing, repairs, operator training, insurance).<br>
+      • <strong>Straight-Line Depreciation:</strong> (Cost − Residual Value) / Useful Life.<br>
+      • <strong>Reducing Balance Depreciation:</strong> Carrying Amount × Rate %.<br>
+      • <strong>Revaluation Model:</strong> Upward revaluation recognized in OCI / Revaluation Surplus. Annual reserves transfer permitted: Dr Revaluation Surplus, Cr Retained Earnings.<br>
+      • <strong>Asset Disposals:</strong> Profit/Loss = Disposal Proceeds / Trade-in − Carrying Amount.</p>
+
+      <h4 style="color:#fbbf24; font-weight:800; margin-top:1rem; margin-bottom:0.4rem;">6. Accruals & Prepayments</h4>
+      <p>• <strong>Prepayments:</strong> Paid in advance $\to$ Current Asset on SOFP, deducted from cash paid in SPL.<br>
+      • <strong>Accruals:</strong> Consumed unbilled $\to$ Current Liability on SOFP, added to cash paid in SPL.<br>
+      • <strong>Working Formula:</strong> SPL Charge = Cash Paid + Opening Prepayment − Closing Prepayment − Opening Accrual + Closing Accrual.</p>
+
+      <h4 style="color:#34d399; font-weight:800; margin-top:1rem; margin-bottom:0.4rem;">7. Irrecoverable Debts & Allowances (IFRS 9)</h4>
+      <p>• <strong>Write-Off:</strong> Dr Irrecoverable Debts Expense, Cr Trade Receivables (removes bad debtor).<br>
+      • <strong>Allowance Calculation:</strong> Apply % to <em>Adjusted</em> Receivables (after write-offs).<br>
+      • <strong>Allowance Adjustment:</strong> Increase is an expense in SPL; Decrease is a credit/income in SPL.<br>
+      • <strong>SOFP Presentation:</strong> Trade Receivables minus Closing Allowance = Net Receivables.</p>
     </div>
     <div class="modal-footer">
       <button class="hud-btn" onclick="document.getElementById('dlg-reference').close()">Close</button>

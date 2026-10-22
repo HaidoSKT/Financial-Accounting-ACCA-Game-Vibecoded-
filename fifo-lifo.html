@@ -3,9 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FIFO vs LIFO Master: Perpetual & Periodic Inventory Simulator</title>
+  <title>FIFO vs AVCO Master: Perpetual & Periodic Inventory Simulator</title>
   <link rel="stylesheet" href="css/fifo-lifo.css">
-  <meta name="description" content="Financial accounting interactive simulator and game mastering FIFO and LIFO under Perpetual and Periodic inventory systems with persistent data storage.">
+  <meta name="description" content="Financial accounting interactive simulator and game mastering FIFO and AVCO (Weighted Average) under Perpetual and Periodic inventory systems with persistent data storage.">
+  <!-- Modern Web Guidance: Color-scheme declaration and FOUC prevention (default: light) -->
+  <meta name="color-scheme" content="light">
+  <script>
+    (function () {
+      const theme = localStorage.getItem('acca_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+      const meta = document.querySelector('meta[name="color-scheme"]');
+      if (meta) meta.content = theme;
+    })();
+  </script>
 </head>
 <body>
 
@@ -16,7 +26,7 @@
         <div class="brand-logo" aria-hidden="true">📦</div>
         <div class="brand-text">
           <h1>
-            FIFO vs LIFO Master
+            FIFO vs AVCO Master
             <span class="badge-tag">Perpetual & Periodic</span>
             <span id="storage-status-badge" class="badge-tag server-status">
               <span style="font-size:0.7rem;">●</span> Connecting...
@@ -53,6 +63,10 @@
           <span>🔥</span>
           <span class="hud-value" id="hud-streak">0x</span>
         </div>
+
+        <button id="btn-theme-toggle" class="hud-btn theme-toggle-btn" title="Switch Theme (Light / Dark)" aria-label="Toggle light or dark theme">
+          ☀️ Light
+        </button>
 
         <button id="btn-sound-toggle" class="hud-btn" title="Toggle Sound Effects">
           🔊 Sound: ON
@@ -104,7 +118,7 @@
           <div>
             <h2 class="game-card-title"><span>🏢</span> 4-Way Inventory Engine & Simulator</h2>
             <p class="game-card-subtitle">
-              Step through identical business transactions to visualize how <strong>FIFO Periodic</strong>, <strong>FIFO Perpetual</strong>, <strong>LIFO Periodic</strong>, and <strong>LIFO Perpetual</strong> allocate inventory costs.
+              Step through identical business transactions to visualize how <strong>FIFO Periodic</strong>, <strong>FIFO Perpetual</strong>, <strong>AVCO Periodic</strong>, and <strong>AVCO Perpetual</strong> allocate inventory costs.
             </p>
           </div>
 
@@ -136,9 +150,9 @@
 
           <div style="display:flex; gap:0.5rem; align-items:center;">
             <span style="font-size:0.75rem; color:var(--text-muted);">Method Focus:</span>
-            <button class="hud-btn active sim-method-filter" data-method="ALL">⚡ All 4 Methods</button>
-            <button class="hud-btn sim-method-filter" data-method="FIFO_PERPETUAL">🔵 FIFO Perp</button>
-            <button class="hud-btn sim-method-filter" data-method="LIFO_PERPETUAL">🔴 LIFO Perp</button>
+            <button class="hud-btn active sim-method-filter" data-method="ALL">⚡ All 4 Systems</button>
+            <button class="hud-btn sim-method-filter" data-method="FIFO">🔵 FIFO</button>
+            <button class="hud-btn sim-method-filter" data-method="AVCO">🟢 AVCO</button>
           </div>
         </div>
 
@@ -224,61 +238,61 @@
             </div>
           </div>
 
-          <!-- 3. LIFO Periodic -->
-          <div class="method-column-card highlight-lifo">
+          <!-- 3. AVCO Periodic -->
+          <div class="method-column-card highlight-avco">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span class="badge-tag badge-lifo-periodic">LIFO Periodic</span>
-              <span style="font-size:0.75rem; color:var(--text-muted);">Period-End</span>
+              <span class="badge-tag badge-avco-periodic">AVCO Periodic</span>
+              <span style="font-size:0.75rem; color:var(--text-muted);">Period-End WAC</span>
             </div>
             <div>
               <div class="stat-row">
                 <span class="stat-label">Ending Inventory Units:</span>
-                <span class="stat-val" id="val-lifo-per-ending-units">--</span>
+                <span class="stat-val" id="val-avco-per-ending-units">--</span>
               </div>
               <div class="stat-row">
                 <span class="stat-label">Ending Inventory ($):</span>
-                <span class="stat-val ending-inv" id="val-lifo-per-ending-cost">--</span>
+                <span class="stat-val ending-inv" id="val-avco-per-ending-cost">--</span>
               </div>
               <div class="stat-row">
                 <span class="stat-label">Cost of Goods Sold (COGS):</span>
-                <span class="stat-val cogs" id="val-lifo-per-cogs">--</span>
+                <span class="stat-val cogs" id="val-avco-per-cogs">--</span>
               </div>
               <div class="stat-row">
                 <span class="stat-label">Gross Profit:</span>
-                <span class="stat-val profit" id="val-lifo-per-profit">--</span>
+                <span class="stat-val profit" id="val-avco-per-profit">--</span>
               </div>
             </div>
-            <div style="font-size:0.75rem; color:#fbbf24; background:rgba(245,158,11,0.08); padding:0.5rem; border-radius:var(--radius-sm);">
-              ✓ Ending inventory drawn from OLDEST base layers forward.
+            <div style="font-size:0.75rem; color:#10b981; background:rgba(16,185,129,0.08); padding:0.5rem; border-radius:var(--radius-sm);">
+              ✓ Single weighted rate: Total COGAS / Total Available Units.
             </div>
           </div>
 
-          <!-- 4. LIFO Perpetual -->
-          <div class="method-column-card highlight-lifo">
+          <!-- 4. AVCO Perpetual -->
+          <div class="method-column-card highlight-avco">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span class="badge-tag badge-lifo-perpetual">LIFO Perpetual</span>
-              <span style="font-size:0.75rem; color:#fb7185; font-weight:700;">Point-in-Time Stack</span>
+              <span class="badge-tag badge-avco-perpetual">AVCO Perpetual</span>
+              <span style="font-size:0.75rem; color:#34d399; font-weight:700;">Moving Average</span>
             </div>
             <div>
               <div class="stat-row">
                 <span class="stat-label">Ending Inventory Units:</span>
-                <span class="stat-val" id="val-lifo-perp-ending-units">--</span>
+                <span class="stat-val" id="val-avco-perp-ending-units">--</span>
               </div>
               <div class="stat-row">
                 <span class="stat-label">Ending Inventory ($):</span>
-                <span class="stat-val ending-inv" id="val-lifo-perp-ending-cost">--</span>
+                <span class="stat-val ending-inv" id="val-avco-perp-ending-cost">--</span>
               </div>
               <div class="stat-row">
                 <span class="stat-label">Cost of Goods Sold (COGS):</span>
-                <span class="stat-val cogs" id="val-lifo-perp-cogs">--</span>
+                <span class="stat-val cogs" id="val-avco-perp-cogs">--</span>
               </div>
               <div class="stat-row">
                 <span class="stat-label">Gross Profit:</span>
-                <span class="stat-val profit" id="val-lifo-perp-profit">--</span>
+                <span class="stat-val profit" id="val-avco-perp-profit">--</span>
               </div>
             </div>
-            <div style="font-size:0.75rem; color:#fb7185; background:rgba(225,29,72,0.08); padding:0.5rem; border-radius:var(--radius-sm);">
-              ✓ Depletes latest available layer on shelf at exact moment of sale.
+            <div style="font-size:0.75rem; color:#34d399; background:rgba(16,185,129,0.08); padding:0.5rem; border-radius:var(--radius-sm);">
+              ✓ Recalculates moving average unit cost on every purchase receipt.
             </div>
           </div>
         </div>
@@ -300,9 +314,9 @@
             <span id="sim-stockcard-icon">▼</span>
           </button>
           <div id="sim-stockcard-container" style="display:none; margin-top:1rem;">
-            <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
+            <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem; flex-wrap:wrap;">
               <button class="btn btn-primary sim-ledger-tab active" data-ledger="FIFO_PERPETUAL">FIFO Perpetual Ledger</button>
-              <button class="btn sim-ledger-tab" data-ledger="LIFO_PERPETUAL">LIFO Perpetual Ledger</button>
+              <button class="btn sim-ledger-tab" data-ledger="AVCO_PERPETUAL">AVCO Perpetual Ledger (Moving Avg)</button>
             </div>
             <div class="table-responsive" id="sim-stockcard-table-wrapper">
               <!-- Stock card table generated here -->
@@ -409,7 +423,7 @@
           <div>
             <h2 class="game-card-title"><span>📊</span> Inventory Ledger & Exam Arena</h2>
             <p class="game-card-subtitle">
-              Rigorous scenario questions testing FIFO and LIFO calculations, periodic formulas, and stock ledger auditing.
+              Rigorous scenario questions testing FIFO and AVCO (Periodic & Perpetual) calculations, stock card auditing, and IAS 2 compliance.
             </p>
           </div>
           <span id="exam-counter" class="hud-pill">Question 1 of 8</span>
@@ -480,8 +494,8 @@
                   <tr style="color:var(--text-muted); border-bottom:1px solid var(--border);">
                     <th style="text-align:left; padding:0.4rem 0;">Metric</th>
                     <th style="text-align:right; color:#38bdf8;">FIFO</th>
-                    <th style="text-align:right; color:#fb7185;">LIFO</th>
-                    <th style="text-align:right; color:#34d399;">LIFO Effect</th>
+                    <th style="text-align:right; color:#34d399;">AVCO</th>
+                    <th style="text-align:right; color:#fbbf24;">Smoothing Impact</th>
                   </tr>
                 </thead>
                 <tbody id="cfo-spl-tbody">
@@ -491,7 +505,7 @@
             </div>
           </div>
 
-          <!-- Balance Sheet & Tax Shield -->
+          <!-- Balance Sheet & Inventory Variance -->
           <div class="statement-card">
             <div class="statement-title">
               <span>Statement of Financial Position (SOFP)</span>
@@ -503,7 +517,7 @@
                   <tr style="color:var(--text-muted); border-bottom:1px solid var(--border);">
                     <th style="text-align:left; padding:0.4rem 0;">Asset / Equity</th>
                     <th style="text-align:right; color:#38bdf8;">FIFO</th>
-                    <th style="text-align:right; color:#fb7185;">LIFO</th>
+                    <th style="text-align:right; color:#34d399;">AVCO</th>
                     <th style="text-align:right; color:#fbbf24;">Variance</th>
                   </tr>
                 </thead>
@@ -513,14 +527,14 @@
               </table>
             </div>
 
-            <!-- LIFO Reserve & Tax Shield Box -->
-            <div style="margin-top:1rem; background:rgba(0,0,0,0.3); border-radius:var(--radius-sm); padding:0.75rem; border-left:3px solid #fbbf24;">
-              <div style="font-size:0.8rem; color:var(--text-muted);">LIFO Reserve Footnote:</div>
-              <div style="font-size:1.1rem; font-weight:800; font-family:var(--font-mono); color:#fbbf24;" id="cfo-lifo-reserve-val">
+            <!-- AVCO Smoothing & Tax Moderation Box -->
+            <div style="margin-top:1rem; background:rgba(0,0,0,0.3); border-radius:var(--radius-sm); padding:0.75rem; border-left:3px solid #34d399;">
+              <div style="font-size:0.8rem; color:var(--text-muted);">AVCO Smoothing Footnote:</div>
+              <div style="font-size:1.1rem; font-weight:800; font-family:var(--font-mono); color:#34d399;" id="cfo-avco-smoothing-val">
                 $0.00
               </div>
               <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;" id="cfo-tax-shield-desc">
-                Estimated corporate cash tax shielded: $0.00
+                AVCO stabilizes inventory carrying amounts and gross margins against market volatility.
               </div>
             </div>
           </div>
@@ -529,10 +543,10 @@
         <!-- Strategic CFO Question Prompts -->
         <div style="background:#0c1322; border:1px solid var(--border); border-radius:var(--radius-md); padding:1.25rem;">
           <h3 style="font-size:1.05rem; font-weight:700; color:#fff; margin-bottom:0.75rem; display:flex; align-items:center; gap:0.5rem;">
-            <span>💼</span> Executive Boardroom Decision Challenge
+            <span>💼</span> Executive Boardroom Decision Challenge (IAS 2 Standards)
           </h3>
           <p id="cfo-challenge-prompt" style="font-size:0.9rem; color:var(--text-main); margin-bottom:1rem;">
-            The company's Board is considering whether to adopt LIFO under US GAAP for tax savings. What is the impact on reported net income?
+            The company's Board is evaluating whether to adopt FIFO or AVCO under IAS 2 (Inventories). What is the strategic impact of AVCO during rising prices?
           </p>
           <div id="cfo-challenge-options" style="display:grid; grid-template-columns:1fr; gap:0.5rem;">
             <!-- CFO options -->
@@ -657,7 +671,7 @@
   <div id="modal-reference" class="modal-overlay">
     <div class="modal-box">
       <div class="modal-header">
-        <h3 class="modal-title">📖 Comprehensive FIFO vs LIFO Reference Guide</h3>
+        <h3 class="modal-title">📖 Comprehensive FIFO vs AVCO Reference Guide (IAS 2)</h3>
         <button class="modal-close" id="modal-close-ref">&times;</button>
       </div>
       <div style="display:flex; flex-direction:column; gap:1.25rem; font-size:0.9rem; line-height:1.6;">
@@ -671,7 +685,7 @@
         </div>
 
         <div>
-          <h4 style="font-weight:700; color:#fff; margin-bottom:0.5rem;">2. The 4 Combinations at a Glance</h4>
+          <h4 style="font-weight:700; color:#fff; margin-bottom:0.5rem;">2. The 4 Combinations at a Glance (IAS 2 Permitted)</h4>
           <div class="table-responsive">
             <table class="stock-ledger-table" style="font-size:0.8rem;">
               <thead>
@@ -696,16 +710,16 @@
                   <td>Continuous queue oldest depleted first (Identical to Periodic!)</td>
                 </tr>
                 <tr>
-                  <td style="font-weight:700; color:#fbbf24;">LIFO</td>
+                  <td style="font-weight:700; color:#10b981;">AVCO</td>
                   <td>Periodic</td>
-                  <td>From OLDEST base purchases forwards</td>
-                  <td>From LATEST purchases in entire period backwards</td>
+                  <td>Ending units × Weighted Average Cost per unit</td>
+                  <td>Units sold × Weighted Average Cost per unit</td>
                 </tr>
                 <tr>
-                  <td style="font-weight:700; color:#fb7185;">LIFO</td>
+                  <td style="font-weight:700; color:#a78bfa;">AVCO</td>
                   <td>Perpetual</td>
-                  <td>Continuous stack remaining on hand</td>
-                  <td>Most recent layer ON HAND at time of each sale</td>
+                  <td>Ending units × Latest Moving Average rate</td>
+                  <td>Each sale costed at Current Moving Average rate</td>
                 </tr>
               </tbody>
             </table>
@@ -715,17 +729,17 @@
         <div>
           <h4 style="font-weight:700; color:#fff; margin-bottom:0.5rem;">3. Inflationary Impact (Rising Prices)</h4>
           <p>
-            When prices rise over time:<br>
-            • <strong>FIFO</strong> produces <strong>Lower COGS</strong>, <strong>Higher Ending Inventory</strong>, <strong>Higher Gross Profit</strong>, and <strong>Higher Income Taxes</strong>.<br>
-            • <strong>LIFO</strong> produces <strong>Higher COGS</strong>, <strong>Lower Ending Inventory</strong>, <strong>Lower Gross Profit</strong>, and <strong>Substantial Cash Tax Savings</strong> (Tax Shield).
+            When purchase costs rise over time:<br>
+            • <strong>FIFO</strong> assigns older (cheaper) costs to COGS, leaving recent (higher) costs in Ending Inventory $\to$ <strong>Lower COGS, Higher Gross Profit, Higher Tax</strong>.<br>
+            • <strong>AVCO</strong> calculates a weighted average rate across all layers $\to$ <strong>Smooths out cost spikes, produces balanced COGS and stable profit margins</strong>.
           </p>
         </div>
 
         <div>
-          <h4 style="font-weight:700; color:#fff; margin-bottom:0.5rem;">4. IFRS vs US GAAP & The LIFO Conformity Rule</h4>
+          <h4 style="font-weight:700; color:#fff; margin-bottom:0.5rem;">4. IFRS & IAS 2 Regulatory Compliance</h4>
           <p>
-            • <strong>IFRS (IAS 2) STRICTLY PROHIBITS LIFO:</strong> Under IFRS, inventory must be valued at Lower of Cost and Net Realisable Value using FIFO or Weighted Average Cost. LIFO is banned because it understates balance sheet assets with stale costs.<br>
-            • <strong>US GAAP (ASC 330) PERMITS LIFO:</strong> Subject to the <strong>LIFO Conformity Rule (IRC § 472)</strong>: If a firm uses LIFO to reduce taxable income on its tax return, it MUST also use LIFO in its financial reports to shareholders.
+            • <strong>IFRS (IAS 2) Standards:</strong> Only <strong>FIFO</strong> and <strong>Weighted Average Cost (AVCO)</strong> are permitted. LIFO is strictly forbidden under IAS 2 because it understates inventory carrying amounts on the Statement of Financial Position with outdated historical costs.<br>
+            • Both FIFO and AVCO ensure inventories are reported at the lower of cost and net realisable value (NRV).
           </p>
         </div>
 

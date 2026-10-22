@@ -1,5 +1,5 @@
 /**
- * FIFO vs LIFO Master - Main UI Controller & Game Loop
+ * FIFO vs AVCO Master - Main UI Controller & Game Loop
  */
 
 (function () {
@@ -247,12 +247,12 @@
     cards.forEach((card, idx) => {
       if (filter === 'ALL') {
         card.style.display = 'flex';
-      } else if (filter === 'FIFO_PERPETUAL' && idx === 1) {
+      } else if (filter === 'FIFO' && (idx === 0 || idx === 1)) {
         card.style.display = 'flex';
-      } else if (filter === 'LIFO_PERPETUAL' && idx === 3) {
+      } else if (filter === 'AVCO' && (idx === 2 || idx === 3)) {
         card.style.display = 'flex';
       } else {
-        card.style.display = filter === 'ALL' ? 'flex' : 'none';
+        card.style.display = 'none';
       }
     });
   }
@@ -298,7 +298,7 @@
     // Update active transaction callout
     $('sim-tx-date').textContent = activeTx.date;
     $('sim-tx-badge').textContent = activeTx.type;
-    $('sim-tx-badge').className = activeTx.type === 'SALE' ? 'badge-tag badge-lifo-perpetual' : 'badge-tag badge-fifo-perpetual';
+    $('sim-tx-badge').className = activeTx.type === 'SALE' ? 'badge-tag badge-sale' : 'badge-tag badge-purchase';
     
     if (activeTx.type === 'SALE') {
       $('sim-tx-text').textContent = `Customer Sale: Shipped ${activeTx.units} units @ ${formatMoney(activeTx.unitPrice)} each. (${activeTx.notes || ''})`;
@@ -323,15 +323,19 @@
     $('val-fifo-perp-cogs').textContent = formatMoney(r.fifoPerpetual.cogs, cur);
     $('val-fifo-perp-profit').textContent = formatMoney(r.fifoPerpetual.grossProfit, cur);
 
-    $('val-lifo-per-ending-units').textContent = `${stepResults.endingUnits} Units`;
-    $('val-lifo-per-ending-cost').textContent = formatMoney(r.lifoPeriodic.endingInventoryCost, cur);
-    $('val-lifo-per-cogs').textContent = formatMoney(r.lifoPeriodic.cogs, cur);
-    $('val-lifo-per-profit').textContent = formatMoney(r.lifoPeriodic.grossProfit, cur);
+    if ($('val-avco-per-ending-units')) {
+      $('val-avco-per-ending-units').textContent = `${stepResults.endingUnits} Units`;
+      $('val-avco-per-ending-cost').textContent = formatMoney(r.avcoPeriodic.endingInventoryCost, cur);
+      $('val-avco-per-cogs').textContent = formatMoney(r.avcoPeriodic.cogs, cur);
+      $('val-avco-per-profit').textContent = formatMoney(r.avcoPeriodic.grossProfit, cur);
+    }
 
-    $('val-lifo-perp-ending-units').textContent = `${stepResults.endingUnits} Units`;
-    $('val-lifo-perp-ending-cost').textContent = formatMoney(r.lifoPerpetual.endingInventoryCost, cur);
-    $('val-lifo-perp-cogs').textContent = formatMoney(r.lifoPerpetual.cogs, cur);
-    $('val-lifo-perp-profit').textContent = formatMoney(r.lifoPerpetual.grossProfit, cur);
+    if ($('val-avco-perp-ending-units')) {
+      $('val-avco-perp-ending-units').textContent = `${stepResults.endingUnits} Units`;
+      $('val-avco-perp-ending-cost').textContent = formatMoney(r.avcoPerpetual.endingInventoryCost, cur);
+      $('val-avco-perp-cogs').textContent = formatMoney(r.avcoPerpetual.cogs, cur);
+      $('val-avco-perp-profit').textContent = formatMoney(r.avcoPerpetual.grossProfit, cur);
+    }
 
     // Render Warehouse Pallets at this step (based on FIFO Perpetual layers)
     renderWarehousePallets(r.fifoPerpetual.endingInventoryLayers, cur);
@@ -384,8 +388,12 @@
 
   function renderSimulatorStockCard() {
     const sc = Data.SCENARIOS[AppState.sim.scenarioIndex];
-    const isFifo = AppState.sim.activeLedgerTab === 'FIFO_PERPETUAL';
-    const result = isFifo ? Engine.calculateFIFOPerpetual(sc.transactions) : Engine.calculateLIFOPerpetual(sc.transactions);
+    let result;
+    if (AppState.sim.activeLedgerTab === 'FIFO_PERPETUAL') {
+      result = Engine.calculateFIFOPerpetual(sc.transactions);
+    } else {
+      result = Engine.calculateAVCOPerpetual(sc.transactions);
+    }
     const cur = sc.currency || '$';
 
     let html = `
@@ -416,7 +424,7 @@
       html += `
         <tr>
           <td style="font-family:var(--font-mono); font-weight:700;">${row.date}</td>
-          <td><span class="badge-tag ${isSale ? 'badge-lifo-perpetual' : 'badge-fifo-perpetual'}">${row.type}</span></td>
+          <td><span class="badge-tag ${isSale ? 'badge-sale' : 'badge-purchase'}">${row.type}</span></td>
           
           <!-- Receipts -->
           <td>${isReceipt ? row.receipts.units : '-'}</td>
@@ -466,7 +474,7 @@
     $('disp-mission-counter').textContent = `Mission ${AppState.disp.missionIndex + 1} of ${Data.DISPATCH_MISSIONS.length}`;
     $('disp-mission-title').textContent = mission.title;
     $('disp-mandate-badge').textContent = mission.mandateLabel;
-    $('disp-mandate-badge').className = mission.mandateMethod.startsWith('FIFO') ? 'badge-tag badge-fifo-perpetual' : 'badge-tag badge-lifo-perpetual';
+    $('disp-mandate-badge').className = mission.mandateMethod.startsWith('FIFO') ? 'badge-tag badge-fifo-perpetual' : 'badge-tag badge-avco-perpetual';
 
     $('disp-client-name').textContent = mission.customer;
     $('disp-required-units').textContent = `${mission.orderUnits} Units`;
@@ -602,7 +610,7 @@
       const progress = Storage.awardProgress(100, 30, true, 'DISPATCHER', `Fulfilled ${mission.title} under ${mission.mandateLabel}`);
       Storage.unlockBadge('first_dispatch');
       if (mission.mandateMethod.startsWith('FIFO')) Storage.unlockBadge('fifo_virtuoso');
-      if (mission.mandateMethod.startsWith('LIFO')) Storage.unlockBadge('lifo_tactician');
+      if (mission.mandateMethod.startsWith('AVCO')) Storage.unlockBadge('avco_tactician');
       if (progress.streak >= 5) Storage.unlockBadge('streak_5');
       if (progress.streak >= 10) Storage.unlockBadge('streak_10');
       if (progress.leveledUp) Audio.playFanfare();
@@ -697,8 +705,7 @@
 
       const progress = Storage.awardProgress(120, 40, true, 'EXAM_ARENA', `Answered Question ${AppState.exam.questionIndex + 1}`);
       Storage.unlockBadge('periodic_master');
-      if (q.targetMethod.includes('RESERVE')) Storage.unlockBadge('lifo_reserve_pro');
-      if (q.targetMethod.includes('LIQUIDATION')) Storage.unlockBadge('liquidation_hero');
+      if (q.targetMethod.includes('AVCO') || q.targetMethod.includes('SMOOTHING')) Storage.unlockBadge('avco_master');
       if (q.targetMethod.includes('IFRS')) Storage.unlockBadge('ifrs_scholar');
       if (progress.streak >= 5) Storage.unlockBadge('streak_5');
       if (progress.streak >= 10) Storage.unlockBadge('streak_10');
@@ -743,7 +750,7 @@
     const cur = sc.currency || '$';
 
     const stFifo = comp.statements.fifoPeriodic;
-    const stLifo = comp.statements.lifoPeriodic;
+    const stAvco = comp.statements.avcoPeriodic;
 
     // Statement of Profit or Loss Body
     const splBody = $('cfo-spl-tbody');
@@ -751,62 +758,65 @@
       <tr>
         <td style="padding:0.4rem 0;">Sales Revenue</td>
         <td style="text-align:right;">${formatMoney(stFifo.revenue, cur)}</td>
-        <td style="text-align:right;">${formatMoney(stLifo.revenue, cur)}</td>
+        <td style="text-align:right;">${formatMoney(stAvco.revenue, cur)}</td>
         <td style="text-align:right; color:var(--text-dim);">$0.00</td>
       </tr>
       <tr>
         <td style="padding:0.4rem 0;">Less: Cost of Goods Sold</td>
         <td style="text-align:right; color:#fb7185;">(${formatMoney(stFifo.cogs, cur)})</td>
-        <td style="text-align:right; color:#fb7185;">(${formatMoney(stLifo.cogs, cur)})</td>
-        <td style="text-align:right; color:#fb7185;">${formatMoney(stLifo.cogs - stFifo.cogs, cur)}</td>
+        <td style="text-align:right; color:#fb7185;">(${formatMoney(stAvco.cogs, cur)})</td>
+        <td style="text-align:right; color:#fb7185;">${formatMoney(stAvco.cogs - stFifo.cogs, cur)}</td>
       </tr>
       <tr style="font-weight:700; border-top:1px solid var(--border);">
         <td style="padding:0.4rem 0;">Gross Profit</td>
         <td style="text-align:right; color:#38bdf8;">${formatMoney(stFifo.grossProfit, cur)}</td>
-        <td style="text-align:right; color:#fb7185;">${formatMoney(stLifo.grossProfit, cur)}</td>
-        <td style="text-align:right;">${formatMoney(stLifo.grossProfit - stFifo.grossProfit, cur)}</td>
+        <td style="text-align:right; color:#34d399;">${formatMoney(stAvco.grossProfit, cur)}</td>
+        <td style="text-align:right;">${formatMoney(stAvco.grossProfit - stFifo.grossProfit, cur)}</td>
       </tr>
       <tr>
         <td style="padding:0.4rem 0;">Operating Expenses</td>
         <td style="text-align:right;">(${formatMoney(stFifo.operatingExpenses, cur)})</td>
-        <td style="text-align:right;">(${formatMoney(stLifo.operatingExpenses, cur)})</td>
+        <td style="text-align:right;">(${formatMoney(stAvco.operatingExpenses, cur)})</td>
         <td style="text-align:right; color:var(--text-dim);">$0.00</td>
       </tr>
       <tr>
         <td style="padding:0.4rem 0;">Income Tax Expense (${stFifo.effectiveTaxRate}%)</td>
         <td style="text-align:right; color:#f59e0b;">(${formatMoney(stFifo.taxExpense, cur)})</td>
-        <td style="text-align:right; color:#f59e0b;">(${formatMoney(stLifo.taxExpense, cur)})</td>
-        <td style="text-align:right; color:#10b981; font-weight:700;">+${formatMoney(stFifo.taxExpense - stLifo.taxExpense, cur)} Tax Shield</td>
+        <td style="text-align:right; color:#f59e0b;">(${formatMoney(stAvco.taxExpense, cur)})</td>
+        <td style="text-align:right; color:#10b981; font-weight:700;">${formatMoney(stFifo.taxExpense - stAvco.taxExpense, cur)} Variance</td>
       </tr>
       <tr style="font-weight:800; border-top:2px solid var(--border); border-bottom:3px double #38bdf8;">
         <td style="padding:0.5rem 0;">Net Income (Profit for Year)</td>
-        <td style="text-align:right; color:#34d399;">${formatMoney(stFifo.netIncome, cur)}</td>
-        <td style="text-align:right; color:#fb7185;">${formatMoney(stLifo.netIncome, cur)}</td>
-        <td style="text-align:right;">${formatMoney(stLifo.netIncome - stFifo.netIncome, cur)}</td>
+        <td style="text-align:right; color:#38bdf8;">${formatMoney(stFifo.netIncome, cur)}</td>
+        <td style="text-align:right; color:#34d399;">${formatMoney(stAvco.netIncome, cur)}</td>
+        <td style="text-align:right;">${formatMoney(stAvco.netIncome - stFifo.netIncome, cur)}</td>
       </tr>
     `;
 
     // Statement of Financial Position Body
     const sofpBody = $('cfo-sofp-tbody');
-    const reserve = comp.lifoReserve.periodic;
+    const spread = Math.abs(stFifo.endingInventory - stAvco.endingInventory);
     sofpBody.innerHTML = `
       <tr>
         <td style="padding:0.4rem 0;">Current Asset: Ending Inventory</td>
         <td style="text-align:right; color:#38bdf8; font-weight:700;">${formatMoney(stFifo.endingInventory, cur)}</td>
-        <td style="text-align:right; color:#fb7185; font-weight:700;">${formatMoney(stLifo.endingInventory, cur)}</td>
-        <td style="text-align:right; color:#fbbf24;">${formatMoney(reserve, cur)} (LIFO Reserve)</td>
+        <td style="text-align:right; color:#34d399; font-weight:700;">${formatMoney(stAvco.endingInventory, cur)}</td>
+        <td style="text-align:right; color:#fbbf24;">${formatMoney(spread, cur)} (Inventory Spread)</td>
       </tr>
       <tr>
-        <td style="padding:0.4rem 0;">Operating Cash Tax Savings</td>
+        <td style="padding:0.4rem 0;">Cumulative Gross Margin Spread</td>
         <td style="text-align:right;">Baseline</td>
-        <td style="text-align:right; color:#10b981; font-weight:700;">+${formatMoney(comp.taxSavingsVsFifo.lifoPeriodic, cur)}</td>
-        <td style="text-align:right; color:#10b981;">Extra Cash on Hand</td>
+        <td style="text-align:right; color:#34d399; font-weight:700;">${formatMoney(stAvco.grossProfit - stFifo.grossProfit, cur)}</td>
+        <td style="text-align:right; color:#38bdf8;">Price Smoothing Effect</td>
       </tr>
     `;
 
-    // LIFO Reserve Display
-    $('cfo-lifo-reserve-val').textContent = `${formatMoney(reserve, cur)}`;
-    $('cfo-tax-shield-desc').textContent = `In this ${comp.priceTrend.toLowerCase()} cycle, LIFO delivers ${formatMoney(comp.taxSavingsVsFifo.lifoPeriodic, cur)} in corporate cash tax savings over FIFO!`;
+    // AVCO Smoothing Footnote Display
+    const footnoteVal = $('cfo-avco-smoothing-val') || $('cfo-lifo-reserve-val');
+    if (footnoteVal) footnoteVal.textContent = `${formatMoney(spread, cur)} Spread`;
+    if ($('cfo-tax-shield-desc')) {
+      $('cfo-tax-shield-desc').textContent = `In this ${comp.priceTrend.toLowerCase()} cycle, AVCO delivers a smoothed inventory valuation of ${formatMoney(stAvco.endingInventory, cur)} vs FIFO's ${formatMoney(stFifo.endingInventory, cur)}, both fully permitted by IAS 2!`;
+    }
   }
 
   function renderCfoChallengeOptions() {
@@ -814,10 +824,10 @@
     optsCont.innerHTML = '';
 
     const choices = [
-      { text: 'LIFO lowers reported Net Income under inflation, but increases operating cash flow by minimizing tax liability.', correct: true },
-      { text: 'LIFO increases both reported Net Income and taxes under inflation.', correct: false },
-      { text: 'LIFO has zero impact on taxes because the IRS requires FIFO for tax returns.', correct: false },
-      { text: 'Under IFRS, companies can use LIFO as long as they disclose the LIFO Reserve.', correct: false }
+      { text: 'Under IAS 2, AVCO smooths out purchase price swings by calculating a blended average cost per unit, avoiding FIFO profit spikes during inflation while remaining 100% compliant with IFRS.', correct: true },
+      { text: 'AVCO increases both reported Net Income and tax liabilities substantially above FIFO during inflation.', correct: false },
+      { text: 'AVCO is prohibited under IAS 2 because IFRS mandates the specific identification method for all interchangeable goods.', correct: false },
+      { text: 'AVCO Periodic and AVCO Perpetual always yield identical financial statements regardless of purchase dates.', correct: false }
     ];
 
     choices.forEach((ch, idx) => {
@@ -835,16 +845,17 @@
           feedback.style.background = 'rgba(16, 185, 129, 0.15)';
           feedback.style.border = '1px solid #10b981';
           feedback.style.color = '#34d399';
-          feedback.innerHTML = `<strong>Board Decision Approved!</strong> Exactly right. The classic CFO trade-off: LIFO reports lower paper earnings to shareholders but delivers genuine cash tax savings under rising prices.`;
-          Storage.awardProgress(150, 50, true, 'CFO_STRATEGY', 'Boardroom LIFO Decision Solved');
-          Storage.unlockBadge('lifo_reserve_pro');
+          feedback.innerHTML = `<strong>Board Decision Approved!</strong> Exactly right. Under IAS 2 (Inventories), AVCO provides a stable, smoothed measure of gross margins and inventory valuation, preventing distorted earnings swings.`;
+          Storage.awardProgress(150, 50, true, 'CFO_STRATEGY', 'Boardroom AVCO Decision Solved');
+          Storage.unlockBadge('avco_master');
+          Storage.unlockBadge('avco_reserve_pro');
           updateHUD();
         } else {
           Audio.playWrong();
           feedback.style.background = 'rgba(239, 68, 68, 0.15)';
           feedback.style.border = '1px solid #ef4444';
           feedback.style.color = '#f87171';
-          feedback.innerHTML = `<strong>Board Rejection:</strong> Review the LIFO Conformity Rule (IRC § 472) and IAS 2 restrictions. LIFO cannot be used under IFRS, and under inflation it reduces profit while preserving cash.`;
+          feedback.innerHTML = `<strong>Board Rejection:</strong> Review IAS 2 requirements. AVCO and FIFO are the only two permitted methods for interchangeable inventories under IFRS; AVCO smooths gross margins relative to FIFO.`;
           Storage.awardProgress(0, 0, false, 'CFO_STRATEGY', 'Incorrect Boardroom Decision');
           updateHUD();
         }
@@ -938,7 +949,7 @@
       tr.innerHTML = `
         <td>${idx + 1}</td>
         <td style="font-family:var(--font-mono);">${tx.date}</td>
-        <td><span class="badge-tag ${isSale ? 'badge-lifo-perpetual' : 'badge-fifo-perpetual'}">${tx.type}</span></td>
+        <td><span class="badge-tag ${isSale ? 'badge-sale' : 'badge-purchase'}">${tx.type}</span></td>
         <td style="font-weight:700;">${tx.units}</td>
         <td>${formatMoney(rate)}</td>
         <td style="font-weight:700;">${formatMoney(total)}</td>
@@ -984,18 +995,19 @@
           <div class="stat-row"><span class="stat-label">Gross Profit:</span><span class="stat-val profit">${formatMoney(res.results.fifoPerpetual.grossProfit)}</span></div>
         </div>
 
-        <div class="method-column-card highlight-lifo">
-          <span class="badge-tag badge-lifo-periodic">LIFO Periodic</span>
-          <div class="stat-row"><span class="stat-label">Ending Inv:</span><span class="stat-val ending-inv">${formatMoney(res.results.lifoPeriodic.endingInventoryCost)}</span></div>
-          <div class="stat-row"><span class="stat-label">COGS:</span><span class="stat-val cogs">${formatMoney(res.results.lifoPeriodic.cogs)}</span></div>
-          <div class="stat-row"><span class="stat-label">Gross Profit:</span><span class="stat-val profit">${formatMoney(res.results.lifoPeriodic.grossProfit)}</span></div>
+
+        <div class="method-column-card highlight-avco">
+          <span class="badge-tag badge-avco-periodic">AVCO Periodic</span>
+          <div class="stat-row"><span class="stat-label">Ending Inv:</span><span class="stat-val ending-inv">${formatMoney(res.results.avcoPeriodic ? res.results.avcoPeriodic.endingInventoryCost : 0)}</span></div>
+          <div class="stat-row"><span class="stat-label">COGS:</span><span class="stat-val cogs">${formatMoney(res.results.avcoPeriodic ? res.results.avcoPeriodic.cogs : 0)}</span></div>
+          <div class="stat-row"><span class="stat-label">Gross Profit:</span><span class="stat-val profit">${formatMoney(res.results.avcoPeriodic ? res.results.avcoPeriodic.grossProfit : 0)}</span></div>
         </div>
 
-        <div class="method-column-card highlight-lifo">
-          <span class="badge-tag badge-lifo-perpetual">LIFO Perpetual</span>
-          <div class="stat-row"><span class="stat-label">Ending Inv:</span><span class="stat-val ending-inv">${formatMoney(res.results.lifoPerpetual.endingInventoryCost)}</span></div>
-          <div class="stat-row"><span class="stat-label">COGS:</span><span class="stat-val cogs">${formatMoney(res.results.lifoPerpetual.cogs)}</span></div>
-          <div class="stat-row"><span class="stat-label">Gross Profit:</span><span class="stat-val profit">${formatMoney(res.results.lifoPerpetual.grossProfit)}</span></div>
+        <div class="method-column-card highlight-avco">
+          <span class="badge-tag badge-avco-perpetual">AVCO Perpetual</span>
+          <div class="stat-row"><span class="stat-label">Ending Inv:</span><span class="stat-val ending-inv">${formatMoney(res.results.avcoPerpetual ? res.results.avcoPerpetual.endingInventoryCost : 0)}</span></div>
+          <div class="stat-row"><span class="stat-label">COGS:</span><span class="stat-val cogs">${formatMoney(res.results.avcoPerpetual ? res.results.avcoPerpetual.cogs : 0)}</span></div>
+          <div class="stat-row"><span class="stat-label">Gross Profit:</span><span class="stat-val profit">${formatMoney(res.results.avcoPerpetual ? res.results.avcoPerpetual.grossProfit : 0)}</span></div>
         </div>
       `;
 
@@ -1220,6 +1232,46 @@
       badgesGrid.appendChild(item);
     });
   }
+
+  // Theme toggle functionality
+  function initTheme() {
+    const currentTheme = localStorage.getItem('acca_theme') || 'light';
+    applyTheme(currentTheme, false);
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'acca_theme') {
+        applyTheme(e.newValue || 'light', false);
+      }
+    });
+  }
+
+  function applyTheme(theme, notify = true) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const meta = document.querySelector('meta[name="color-scheme"]');
+    if (meta) meta.content = theme;
+    const btn = $('btn-theme-toggle');
+    if (btn) {
+      btn.innerHTML = theme === 'dark' ? '🌙 Dark' : '☀️ Light';
+      btn.title = `Switch to ${theme === 'dark' ? 'Light' : 'Dark'} theme`;
+    }
+    if (notify) {
+      showToast(`Switched to ${theme === 'dark' ? 'Dark' : 'Light'} theme`, 'info');
+    }
+  }
+
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    const next = current === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('acca_theme', next);
+    applyTheme(next, true);
+    if (Audio && Audio.play) Audio.play('click');
+  }
+
+  const themeBtn = $('btn-theme-toggle');
+  if (themeBtn) {
+    themeBtn.addEventListener('click', toggleTheme);
+  }
+  initTheme();
 
   // Sound toggle button
   $('btn-sound-toggle').addEventListener('click', () => {

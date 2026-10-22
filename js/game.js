@@ -10,6 +10,12 @@ class GameEngine {
     this.tAccountIndex = 0;
     this.detectiveIndex = 0;
     this.blitzIndex = 0;
+    this.cvrIndex = 0;
+    this.depIndex = 0;
+    this.dispIndex = 0;
+    this.accrualsIndex = 0;
+    this.debtsIndex = 0;
+    this.ppeActiveSubtab = 'cvr';
 
     // State for DEAD CLIC mode
     this.selectedDebit = null;
@@ -31,9 +37,24 @@ class GameEngine {
     this.loadStatementArchitect();
     this.loadInventoryChallenge();
     this.loadBlitzQuestion();
+    this.loadCvrItem();
+    this.loadDepreciationScenario(0);
+    this.loadDisposalScenario(0);
+    this.loadAccrualsScenario();
+    this.loadDebtsCase();
   }
 
   setupNavigation() {
+    // Theme initialization (defaults to light per user request)
+    this.initTheme();
+
+    const themeBtn = document.getElementById('btn-theme-toggle');
+    if (themeBtn) {
+      themeBtn.addEventListener('click', () => {
+        this.toggleTheme();
+      });
+    }
+
     document.querySelectorAll('.nav-tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const mode = btn.dataset.tab;
@@ -76,6 +97,43 @@ class GameEngine {
         if (dlg) dlg.showModal();
       });
     }
+  }
+
+  initTheme() {
+    const currentTheme = localStorage.getItem('acca_theme') || 'light';
+    this.applyTheme(currentTheme, false);
+
+    // Cross-tab synchronization via storage event
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'acca_theme') {
+        this.applyTheme(e.newValue || 'light', false);
+      }
+    });
+  }
+
+  applyTheme(theme, showNotification = true) {
+    document.documentElement.setAttribute('data-theme', theme);
+    const meta = document.querySelector('meta[name="color-scheme"]');
+    if (meta) meta.content = theme;
+
+    const btn = document.getElementById('btn-theme-toggle');
+    if (btn) {
+      btn.innerHTML = theme === 'dark' ? '🌙 Dark' : '☀️ Light';
+      btn.setAttribute('aria-label', `Current theme is ${theme}. Click to switch theme.`);
+      btn.title = `Switch to ${theme === 'dark' ? 'Light' : 'Dark'} theme`;
+    }
+
+    if (showNotification && window.showToast) {
+      window.showToast(`Switched to ${theme === 'dark' ? 'Dark' : 'Light'} theme`, 'info');
+    }
+  }
+
+  toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme') || 'light';
+    const next = current === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('acca_theme', next);
+    this.applyTheme(next, true);
+    if (window.soundEngine) window.soundEngine.play('click');
   }
 
   setupModals() {
@@ -701,6 +759,390 @@ class GameEngine {
   nextBlitz() {
     this.blitzIndex++;
     this.loadBlitzQuestion();
+  }
+
+  /* -------------------------------------------------------------
+     MODE 7: CHAPTER 8: PPE & DEPRECIATION (IAS 16)
+  ------------------------------------------------------------- */
+  switchPpeSubtab(subtab) {
+    this.ppeActiveSubtab = subtab;
+    document.querySelectorAll('.ppe-subtab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.subtab === subtab);
+      btn.classList.toggle('primary', btn.dataset.subtab === subtab);
+    });
+
+    document.querySelectorAll('.ppe-subview').forEach(view => {
+      view.style.display = view.id === `ppe-subview-${subtab}` ? 'block' : 'none';
+    });
+
+    if (window.soundEngine) window.soundEngine.play('click');
+  }
+
+  loadCvrItem() {
+    const list = window.ACCA_DATA.PPE_CHAPTER8_DATA.capitalVsRevenue;
+    const item = list[this.cvrIndex % list.length];
+
+    const counter = document.getElementById('cvr-counter');
+    if (counter) counter.textContent = `Item ${this.cvrIndex + 1} of ${list.length}`;
+
+    const text = document.getElementById('cvr-item-text');
+    if (text) text.textContent = item.description;
+
+    const feedback = document.getElementById('cvr-feedback');
+    if (feedback) {
+      feedback.className = 'feedback-box';
+      feedback.innerHTML = '';
+    }
+
+    const nextBtn = document.getElementById('cvr-btn-next');
+    if (nextBtn) nextBtn.style.display = 'none';
+  }
+
+  submitCvrChoice(choice) {
+    const list = window.ACCA_DATA.PPE_CHAPTER8_DATA.capitalVsRevenue;
+    const item = list[this.cvrIndex % list.length];
+    const isCorrect = choice === item.category;
+
+    const feedback = document.getElementById('cvr-feedback');
+    feedback.className = `feedback-box show ${isCorrect ? 'correct' : 'wrong'}`;
+
+    if (isCorrect) {
+      window.storageManager.recordAnswer(true, 'ppe');
+      window.storageManager.addXp(30);
+      if (window.soundEngine) window.soundEngine.play('correct');
+
+      feedback.innerHTML = `
+        <strong>✓ Correct Classification! (+30 XP)</strong>
+        <p style="margin-top:0.3rem;"><strong>Class:</strong> ${item.categoryLabel}</p>
+        <p style="font-size:0.85rem; opacity:0.9;">${item.explanation}</p>
+      `;
+    } else {
+      window.storageManager.recordAnswer(false, 'ppe');
+      if (window.soundEngine) window.soundEngine.play('wrong');
+
+      feedback.innerHTML = `
+        <strong>✗ Incorrect Classification!</strong>
+        <p style="margin-top:0.3rem;"><strong>Correct Class:</strong> ${item.categoryLabel}</p>
+        <p style="font-size:0.85rem; opacity:0.9;">${item.explanation}</p>
+      `;
+    }
+
+    document.getElementById('cvr-btn-next').style.display = 'inline-block';
+    this.updateHUD();
+  }
+
+  nextCvrItem() {
+    this.cvrIndex++;
+    this.loadCvrItem();
+  }
+
+  loadDepreciationScenario(idx) {
+    const scenarios = window.ACCA_DATA.PPE_CHAPTER8_DATA.depreciationScenarios;
+    const sc = scenarios[idx] || scenarios[0];
+    const details = document.getElementById('dep-scenario-details');
+    if (!details) return;
+
+    if (sc.id === 'dep_sl') {
+      details.innerHTML = `
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.75rem; margin-bottom:0.75rem;">
+          <div>Cost: <strong style="color:#fff;">£${sc.cost.toLocaleString()}</strong></div>
+          <div>Residual Value: <strong style="color:#fbbf24;">£${sc.residualValue.toLocaleString()}</strong></div>
+          <div>Useful Life: <strong style="color:#38bdf8;">${sc.usefulLifeYears} years</strong></div>
+          <div>Annual Depreciation: <strong style="color:#34d399;">£${sc.annualDepreciation.toLocaleString()} / yr</strong></div>
+        </div>
+        <div style="background:rgba(0,0,0,0.25); padding:0.6rem; border-radius:6px; font-family:var(--font-mono); font-size:0.8rem;">
+          Formula: (${sc.cost} − ${sc.residualValue}) / ${sc.usefulLifeYears} = £${sc.annualDepreciation.toLocaleString()}<br>
+          Year 1 Carrying Amount: £${sc.cost.toLocaleString()} − £${sc.annualDepreciation.toLocaleString()} = £${sc.year1CarryingAmount.toLocaleString()}<br>
+          Year 2 Carrying Amount: £${sc.year1CarryingAmount.toLocaleString()} − £${sc.year2Depreciation.toLocaleString()} = £${sc.year2CarryingAmount.toLocaleString()}
+        </div>
+        <p style="margin-top:0.5rem; font-size:0.8rem; color:#fcd34d;">💡 ${sc.rule}</p>
+      `;
+    } else if (sc.id === 'dep_rb') {
+      details.innerHTML = `
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.75rem; margin-bottom:0.75rem;">
+          <div>Cost: <strong style="color:#fff;">£${sc.cost.toLocaleString()}</strong></div>
+          <div>Depreciation Rate: <strong style="color:#38bdf8;">${sc.depreciationRatePct}% per annum</strong></div>
+          <div>Year 1 Depn: <strong style="color:#34d399;">£${sc.year1Depreciation.toLocaleString()}</strong></div>
+          <div>Year 2 Depn: <strong style="color:#34d399;">£${sc.year2Depreciation.toLocaleString()}</strong></div>
+        </div>
+        <div style="background:rgba(0,0,0,0.25); padding:0.6rem; border-radius:6px; font-family:var(--font-mono); font-size:0.8rem;">
+          Year 1 Depn: ${sc.depreciationRatePct}% × £${sc.cost.toLocaleString()} = £${sc.year1Depreciation.toLocaleString()} ➔ Carrying Amt = £${sc.year1CarryingAmount.toLocaleString()}<br>
+          Year 2 Depn: ${sc.depreciationRatePct}% × £${sc.year1CarryingAmount.toLocaleString()} = £${sc.year2Depreciation.toLocaleString()} ➔ Carrying Amt = £${sc.year2CarryingAmount.toLocaleString()}
+        </div>
+        <p style="margin-top:0.5rem; font-size:0.8rem; color:#fcd34d;">💡 ${sc.rule}</p>
+      `;
+    } else if (sc.id === 'dep_prorata') {
+      details.innerHTML = `
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:0.75rem; margin-bottom:0.75rem;">
+          <div>Cost: <strong style="color:#fff;">£${sc.cost.toLocaleString()}</strong></div>
+          <div>Acquisition Date: <strong style="color:#38bdf8;">${sc.acquisitionDate}</strong></div>
+          <div>Months Owned in Year: <strong style="color:#fbbf24;">${sc.monthsOwnedInYear1} / 12 months</strong></div>
+          <div>Year 1 Pro-Rata Depn: <strong style="color:#34d399;">£${sc.year1Depreciation.toLocaleString()}</strong></div>
+        </div>
+        <div style="background:rgba(0,0,0,0.25); padding:0.6rem; border-radius:6px; font-family:var(--font-mono); font-size:0.8rem;">
+          Full Year Depn: £${sc.cost.toLocaleString()} / ${sc.usefulLifeYears} = £6,000 / yr<br>
+          Year 1 Pro-Rata Charge: £6,000 × (3 / 12) = £${sc.year1Depreciation.toLocaleString()}<br>
+          Carrying Amount at 31 Dec: £${sc.cost.toLocaleString()} − £${sc.year1Depreciation.toLocaleString()} = £${sc.year1CarryingAmount.toLocaleString()}
+        </div>
+        <p style="margin-top:0.5rem; font-size:0.8rem; color:#fcd34d;">💡 ${sc.rule}</p>
+      `;
+    }
+  }
+
+  loadDisposalScenario(idx) {
+    const scenarios = window.ACCA_DATA.PPE_CHAPTER8_DATA.disposalScenarios;
+    const sc = scenarios[idx] || scenarios[0];
+    const container = document.getElementById('disp-taccount-container');
+    if (!container) return;
+
+    const isProfit = sc.resultType === 'PROFIT';
+
+    container.innerHTML = `
+      <div style="text-align:center; margin-bottom:1rem;">
+        <h4 style="font-size:1.05rem; font-weight:800; color:#fff;">Asset Disposal Account (General Ledger)</h4>
+        <span style="font-size:0.8rem; color:var(--text-muted);">${sc.title}</span>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; background:#0b1120; border:2px solid var(--border); border-radius:8px; padding:1rem; position:relative;">
+        <!-- Debit Side -->
+        <div>
+          <div style="font-weight:700; color:#38bdf8; border-bottom:2px solid #38bdf8; padding-bottom:0.3rem; margin-bottom:0.5rem; font-size:0.85rem;">
+            DEBIT (DR)
+          </div>
+          <div style="font-size:0.85rem; line-height:1.8; font-family:var(--font-mono);">
+            <div style="display:flex; justify-content:space-between;">
+              <span>PPE at Cost (Removal)</span>
+              <strong>£${sc.originalCost.toLocaleString()}</strong>
+            </div>
+            ${isProfit ? `
+            <div style="display:flex; justify-content:space-between; color:#34d399; font-weight:700;">
+              <span>Profit on Disposal (to SPL)</span>
+              <strong>£${sc.gainLossAmount.toLocaleString()}</strong>
+            </div>` : ''}
+          </div>
+        </div>
+
+        <!-- Credit Side -->
+        <div style="border-left:1px solid var(--border); padding-left:1.5rem;">
+          <div style="font-weight:700; color:#fb7185; border-bottom:2px solid #fb7185; padding-bottom:0.3rem; margin-bottom:0.5rem; font-size:0.85rem;">
+            CREDIT (CR)
+          </div>
+          <div style="font-size:0.85rem; line-height:1.8; font-family:var(--font-mono);">
+            <div style="display:flex; justify-content:space-between;">
+              <span>Accumulated Depreciation</span>
+              <strong>£${sc.accumulatedDepreciation.toLocaleString()}</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span>${sc.cashSaleProceeds ? 'Bank (Cash Proceeds)' : 'Part-Exchange Allowance'}</span>
+              <strong style="color:#fbbf24;">£${(sc.cashSaleProceeds || sc.partExchangeAllowance).toLocaleString()}</strong>
+            </div>
+            ${!isProfit ? `
+            <div style="display:flex; justify-content:space-between; color:#fb7185; font-weight:700;">
+              <span>Loss on Disposal (to SPL)</span>
+              <strong>£${sc.gainLossAmount.toLocaleString()}</strong>
+            </div>` : ''}
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:1rem; background:rgba(0,0,0,0.3); border-radius:6px; padding:0.85rem; font-family:var(--font-mono); font-size:0.8rem; line-height:1.7;">
+        <strong style="color:#60a5fa;">Official ACCA 4-Step Working:</strong><br>
+        ${sc.tAccountSteps.join('<br>')}
+      </div>
+      <p style="margin-top:0.5rem; font-size:0.825rem; color:#fcd34d;">💡 ${sc.rule}</p>
+    `;
+  }
+
+  /* -------------------------------------------------------------
+     MODE 8: ACCRUALS & PREPAYMENTS BALANCER
+  ------------------------------------------------------------- */
+  loadAccrualsScenario() {
+    const list = window.ACCA_DATA.ACCRUALS_PREPAYMENTS_DATA;
+    const sc = list[this.accrualsIndex % list.length];
+
+    const counter = document.getElementById('accruals-counter');
+    if (counter) counter.textContent = `Scenario ${this.accrualsIndex + 1} of ${list.length}`;
+
+    const title = document.getElementById('accruals-title');
+    if (title) title.textContent = sc.accountName;
+
+    const actType = document.getElementById('accruals-account-type');
+    if (actType) actType.textContent = sc.nature === 'EXPENSE' ? 'Expense Account Adjustment' : 'Income Account Adjustment';
+
+    const narrative = document.getElementById('accruals-scenario-text');
+    if (narrative) {
+      if (sc.nature === 'EXPENSE') {
+        narrative.innerHTML = `
+          Opening balances: <strong>${sc.openingPrepayment ? `Prepayment b/d £${sc.openingPrepayment}` : `Accrual b/d £${sc.openingAccrual}`}</strong>.<br>
+          During the year ended 31 December, cash payments debited from Bank totaled <strong>£${sc.cashPaidDuringYear.toLocaleString()}</strong>.<br>
+          At year end, closing records show: <strong>${sc.closingPrepayment ? `Prepayment c/d £${sc.closingPrepayment}` : `Accrual c/d £${sc.closingAccrual}`}</strong>.
+        `;
+      } else {
+        narrative.innerHTML = `
+          Opening balances: <strong>${sc.openingAccruedIncome ? `Accrued Income b/d £${sc.openingAccruedIncome}` : `Deferred Income b/d £${sc.openingDeferredIncome}`}</strong>.<br>
+          During the year, cash receipts credited to the account totaled <strong>£${sc.cashReceivedDuringYear.toLocaleString()}</strong>.<br>
+          At year end, closing records show: <strong>${sc.closingDeferredIncome ? `Deferred Income c/d £${sc.closingDeferredIncome}` : `Accrued Income c/d £${sc.closingAccruedIncome}`}</strong>.
+        `;
+      }
+    }
+
+    // Render T-Account
+    const wrapper = document.getElementById('accruals-taccount-wrapper');
+    if (wrapper) {
+      wrapper.innerHTML = `
+        <div style="text-align:center; margin-bottom:0.75rem;">
+          <h4 style="font-size:1rem; font-weight:700; color:#fff;">${sc.accountName} (T-Account Ledger)</h4>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; background:#0b1120; border:2px solid var(--border); border-radius:8px; padding:1rem; font-size:0.85rem; font-family:var(--font-mono);">
+          <!-- Debit Side -->
+          <div>
+            <div style="font-weight:700; color:#38bdf8; border-bottom:1px solid #38bdf8; margin-bottom:0.4rem;">DEBIT (DR)</div>
+            ${sc.openingPrepayment ? `<div>Opening Prepayment b/d: <strong>£${sc.openingPrepayment}</strong></div>` : ''}
+            ${sc.cashPaidDuringYear ? `<div>Bank (Cash Paid): <strong>£${sc.cashPaidDuringYear.toLocaleString()}</strong></div>` : ''}
+            ${sc.closingDeferredIncome ? `<div>Closing Deferred Income: <strong>£${sc.closingDeferredIncome}</strong></div>` : ''}
+            <div style="color:#34d399; margin-top:0.4rem;">to Statement of Profit or Loss: <strong>[?]</strong></div>
+          </div>
+          <!-- Credit Side -->
+          <div style="border-left:1px solid var(--border); padding-left:1rem;">
+            <div style="font-weight:700; color:#fb7185; border-bottom:1px solid #fb7185; margin-bottom:0.4rem;">CREDIT (CR)</div>
+            ${sc.openingAccrual ? `<div>Opening Accrual b/d: <strong>£${sc.openingAccrual}</strong></div>` : ''}
+            ${sc.cashReceivedDuringYear ? `<div>Bank (Cash Received): <strong>£${sc.cashReceivedDuringYear.toLocaleString()}</strong></div>` : ''}
+            ${sc.closingPrepayment ? `<div>Closing Prepayment c/d: <strong>£${sc.closingPrepayment}</strong></div>` : ''}
+            ${sc.closingAccrual ? `<div>Closing Accrual c/d: <strong>£${sc.closingAccrual}</strong></div>` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    document.getElementById('input-accruals-spl').value = '';
+    document.getElementById('input-accruals-sofp').value = '';
+
+    const feedback = document.getElementById('accruals-feedback');
+    feedback.className = 'feedback-box';
+    feedback.innerHTML = '';
+    document.getElementById('accruals-btn-next').style.display = 'none';
+  }
+
+  submitAccrualsSolution() {
+    const list = window.ACCA_DATA.ACCRUALS_PREPAYMENTS_DATA;
+    const sc = list[this.accrualsIndex % list.length];
+
+    const splVal = parseInt(document.getElementById('input-accruals-spl').value, 10);
+    const sofpVal = parseInt(document.getElementById('input-accruals-sofp').value, 10);
+
+    const isSplCorrect = splVal === sc.splCharge;
+    const isSofpCorrect = sofpVal === sc.sofpBalance;
+    const isAllCorrect = isSplCorrect && isSofpCorrect;
+
+    const feedback = document.getElementById('accruals-feedback');
+    feedback.className = `feedback-box show ${isAllCorrect ? 'correct' : 'wrong'}`;
+
+    if (isAllCorrect) {
+      window.storageManager.recordAnswer(true, 'accruals');
+      window.storageManager.addXp(40);
+      if (window.soundEngine) window.soundEngine.play('correct');
+
+      feedback.innerHTML = `
+        <strong>✓ Accruals Balancing Perfect! (+40 XP)</strong>
+        <p style="margin-top:0.4rem;">Statement of Profit or Loss charge = <strong>£${sc.splCharge.toLocaleString()}</strong>.</p>
+        <p>Statement of Financial Position balance = <strong>£${sc.sofpBalance.toLocaleString()}</strong> (${sc.sofpCategory}).</p>
+        <p style="font-size:0.85rem; opacity:0.9; margin-top:0.3rem;">${sc.explanation}</p>
+      `;
+    } else {
+      window.storageManager.recordAnswer(false, 'accruals');
+      if (window.soundEngine) window.soundEngine.play('wrong');
+
+      feedback.innerHTML = `
+        <strong>✗ Calculation Variance!</strong>
+        <p style="margin-top:0.4rem;">Expected SPL Charge: <strong>£${sc.splCharge.toLocaleString()}</strong> | SOFP Balance: <strong>£${sc.sofpBalance.toLocaleString()}</strong></p>
+        <p style="font-size:0.85rem; opacity:0.9;">${sc.explanation}</p>
+      `;
+    }
+
+    document.getElementById('accruals-btn-next').style.display = 'inline-block';
+    this.updateHUD();
+  }
+
+  nextAccrualsScenario() {
+    this.accrualsIndex++;
+    this.loadAccrualsScenario();
+  }
+
+  /* -------------------------------------------------------------
+     MODE 9: IRRECOVERABLE DEBTS & ALLOWANCES (RECEIVABLES)
+  ------------------------------------------------------------- */
+  loadDebtsCase() {
+    const list = window.ACCA_DATA.IRRECOVERABLE_DEBTS_DATA;
+    const sc = list[this.debtsIndex % list.length];
+
+    document.getElementById('debts-counter').textContent = `Audit Case ${this.debtsIndex + 1} of ${list.length}`;
+    document.getElementById('debts-case-title').textContent = sc.title;
+    document.getElementById('debts-narrative').textContent = sc.narrative;
+
+    document.getElementById('debts-calc-gross').textContent = `£${sc.grossReceivables.toLocaleString()}`;
+    document.getElementById('debts-calc-writeoff').textContent = `(£${sc.irrecoverableDebtWriteOff.toLocaleString()})`;
+    document.getElementById('debts-calc-adj').textContent = `£${sc.adjustedReceivables.toLocaleString()}`;
+
+    document.getElementById('debts-calc-req-allowance').textContent = `£${sc.requiredClosingAllowance.toLocaleString()} (${sc.allowancePercentage}%)`;
+    document.getElementById('debts-calc-open-allowance').textContent = `(£${sc.openingAllowance.toLocaleString()})`;
+    document.getElementById('debts-calc-allowance-adj').textContent = `£${sc.allowanceAdjustmentAmount.toLocaleString()} ${sc.allowanceAdjustmentType}`;
+
+    document.getElementById('input-debts-spl').value = '';
+    document.getElementById('input-debts-sofp').value = '';
+
+    const feedback = document.getElementById('debts-feedback');
+    feedback.className = 'feedback-box';
+    feedback.innerHTML = '';
+    document.getElementById('debts-btn-next').style.display = 'none';
+  }
+
+  submitDebtsSolution() {
+    const list = window.ACCA_DATA.IRRECOVERABLE_DEBTS_DATA;
+    const sc = list[this.debtsIndex % list.length];
+
+    const splVal = parseInt(document.getElementById('input-debts-spl').value, 10);
+    const sofpVal = parseInt(document.getElementById('input-debts-sofp').value, 10);
+
+    const expectedSpl = sc.totalSplCharge !== undefined ? sc.totalSplCharge : -sc.netSplImpact;
+    const isSplCorrect = Math.abs(splVal) === Math.abs(expectedSpl);
+    const isSofpCorrect = sofpVal === sc.sofpNetReceivables;
+    const isAllCorrect = isSplCorrect && isSofpCorrect;
+
+    const feedback = document.getElementById('debts-feedback');
+    feedback.className = `feedback-box show ${isAllCorrect ? 'correct' : 'wrong'}`;
+
+    if (isAllCorrect) {
+      window.storageManager.recordAnswer(true, 'debts');
+      window.storageManager.addXp(45);
+      if (window.soundEngine) window.soundEngine.play('correct');
+
+      feedback.innerHTML = `
+        <strong>✓ Receivables Audit Verified! (+45 XP)</strong>
+        <p style="margin-top:0.4rem;">Statement of Profit or Loss net charge: <strong>£${expectedSpl.toLocaleString()}</strong>.</p>
+        <p>Statement of Financial Position Net Receivables: <strong>£${sc.sofpNetReceivables.toLocaleString()}</strong> (£${sc.adjustedReceivables.toLocaleString()} Gross − £${sc.requiredClosingAllowance.toLocaleString()} Allowance).</p>
+        <div style="background:rgba(0,0,0,0.3); padding:0.6rem; border-radius:6px; margin-top:0.5rem; font-family:var(--font-mono); font-size:0.8rem;">
+          ${sc.journalEntries.join('<br>')}
+        </div>
+        <p style="font-size:0.8rem; color:#fcd34d; margin-top:0.4rem;">💡 ${sc.rule}</p>
+      `;
+    } else {
+      window.storageManager.recordAnswer(false, 'debts');
+      if (window.soundEngine) window.soundEngine.play('wrong');
+
+      feedback.innerHTML = `
+        <strong>✗ Audit Reconciliation Error!</strong>
+        <p style="margin-top:0.4rem;">Expected SPL Net: <strong>£${expectedSpl.toLocaleString()}</strong> | Expected SOFP Net Receivables: <strong>£${sc.sofpNetReceivables.toLocaleString()}</strong></p>
+        <p style="font-size:0.85rem; opacity:0.9;">Ensure you apply the allowance percentage AFTER writing off specific debts!</p>
+      `;
+    }
+
+    document.getElementById('debts-btn-next').style.display = 'inline-block';
+    this.updateHUD();
+  }
+
+  nextDebtsCase() {
+    this.debtsIndex++;
+    this.loadDebtsCase();
   }
 
   /* -------------------------------------------------------------

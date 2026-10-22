@@ -1,5 +1,6 @@
 /**
- * FIFO vs LIFO Master Game - Educational Data, Scenarios & Reference Matrix
+ * FIFO vs AVCO Master Game - Educational Data, Scenarios & Reference Matrix
+ * Compliant with ACCA FA / FFA & IFRS (IAS 2 Inventories)
  */
 
 (function (root, factory) {
@@ -15,10 +16,10 @@
     { level: 1, minXp: 0, title: 'Junior Stock Clerk', badgeIcon: '📋', perk: 'Unlocked Basic Warehouse Dispatch' },
     { level: 2, minXp: 200, title: 'Warehouse Inventory Specialist', badgeIcon: '📦', perk: 'Unlocked 4-Way Comparison Simulator' },
     { level: 3, minXp: 500, title: 'Cost Accounting Analyst', badgeIcon: '📊', perk: 'Unlocked Periodic vs Perpetual Ledger Arena' },
-    { level: 4, minXp: 1000, title: 'Inventory Controller', badgeIcon: '🔍', perk: 'Unlocked LIFO Reserve Calculator & Audit' },
+    { level: 4, minXp: 1000, title: 'Inventory Controller', badgeIcon: '🔍', perk: 'Unlocked AVCO Moving Average Calculator & Audit' },
     { level: 5, minXp: 1800, title: 'Senior Cost Accountant', badgeIcon: '⚖️', perk: 'Unlocked Custom Company Sandbox Builder' },
-    { level: 6, minXp: 2800, title: 'Supply Chain Finance Manager', badgeIcon: '🚢', perk: 'Unlocked LIFO Liquidation Detective' },
-    { level: 7, minXp: 4000, title: 'Director of Financial Reporting', badgeIcon: '🏛️', perk: 'Unlocked IFRS vs US GAAP Boardroom Cases' },
+    { level: 6, minXp: 2800, title: 'Supply Chain Finance Manager', badgeIcon: '🚢', perk: 'Unlocked Price Fluctuation & Smoothing Analytics' },
+    { level: 7, minXp: 4000, title: 'Director of Financial Reporting', badgeIcon: '🏛️', perk: 'Unlocked IFRS IAS 2 Boardroom Decision Cases' },
     { level: 8, minXp: 5500, title: 'Chief Financial Officer (CFO)', badgeIcon: '👑', perk: 'Master of Global Inventory Valuation' }
   ];
 
@@ -26,14 +27,14 @@
   const BADGES = [
     { id: 'first_dispatch', name: 'First Dispatch', icon: '📦', desc: 'Successfully fulfilled and costed your first customer order' },
     { id: 'fifo_virtuoso', name: 'FIFO Virtuoso', icon: '🔵', desc: 'Proved FIFO Periodic and Perpetual yield identical COGS' },
-    { id: 'lifo_tactician', name: 'LIFO Perpetual Tactician', icon: '🔴', desc: 'Correctly depleted real-time date-stamped LIFO layers' },
-    { id: 'periodic_master', name: 'Periodic Period-End Master', icon: '⚖️', desc: 'Valued period-end ending inventory under both FIFO & LIFO' },
+    { id: 'avco_tactician', name: 'AVCO Moving Average Tactician', icon: '🟢', desc: 'Correctly tracked real-time recalculated moving average cost per unit' },
+    { id: 'periodic_master', name: 'Periodic Period-End Master', icon: '⚖️', desc: 'Valued period-end ending inventory under both FIFO & AVCO' },
     { id: 'reconciler', name: 'The Great Reconciler', icon: '⚡', desc: 'Analyzed a full 4-way comparative inventory matrix' },
     { id: 'streak_5', name: 'Steady Stockmaster', icon: '🔥', desc: 'Achieved a 5x flawless dispatch or calculation streak' },
     { id: 'streak_10', name: 'Flawless Auditor', icon: '🌟', desc: 'Achieved a 10x perfect combo streak' },
-    { id: 'lifo_reserve_pro', name: 'LIFO Reserve Detective', icon: '🕵️', desc: 'Accurately calculated LIFO Reserve and tax shielding' },
-    { id: 'liquidation_hero', name: 'Liquidation Survivor', icon: '🛡️', desc: 'Mastered the financial threat of LIFO liquidation' },
-    { id: 'ifrs_scholar', name: 'IAS 2 vs GAAP Scholar', icon: '📜', desc: 'Conquered international accounting standards differences' },
+    { id: 'avco_reserve_pro', name: 'AVCO Spread Analyst', icon: '📊', desc: 'Accurately calculated FIFO vs AVCO inventory difference and profit impact' },
+    { id: 'ifrs_scholar', name: 'IAS 2 Scholar', icon: '📜', desc: 'Mastered standard-compliant inventory valuation under IAS 2' },
+    { id: 'avco_master', name: 'AVCO Moving Average Virtuoso', icon: '🟢', desc: 'Mastered Periodic Weighted Average & Perpetual Moving AVCO per IAS 2' },
     { id: 'tycoon_builder', name: 'Inventory Tycoon', icon: '🏭', desc: 'Created, saved and analyzed a custom company scenario' },
     { id: 'cfo_throne', name: 'CFO Ascension', icon: '👑', desc: 'Attained Level 8 Chief Financial Officer rank' }
   ];
@@ -44,7 +45,7 @@
       id: 'apex_inflation',
       name: 'Apex Semiconductor Corp',
       subtitle: 'Surging Microchip Prices (Inflationary Cycle)',
-      description: 'Demand for AI microchips is accelerating costs throughout March. Experience why FIFO inflates profits while LIFO shields cash from taxation.',
+      description: 'Demand for AI microchips is accelerating costs throughout March. Compare how FIFO reflects recent replacement prices on the SOFP while AVCO smooths gross profit margins.',
       taxRate: 0.25,
       operatingExpenses: 150,
       currency: '$',
@@ -61,7 +62,7 @@
       id: 'nordic_timber',
       name: 'Nordic Timber & Pulp Ltd',
       subtitle: 'Falling Commodity Cycle (Deflationary Environment)',
-      description: 'Lumber prices drop sharply over the quarter. Observe the reversal where FIFO produces higher COGS and lower ending inventory than LIFO.',
+      description: 'Lumber prices drop sharply over the quarter. Observe the reversal where AVCO produces lower COGS and higher ending inventory than FIFO.',
       taxRate: 0.25,
       operatingExpenses: 200,
       currency: '€',
@@ -78,7 +79,7 @@
       id: 'lumina_fluctuating',
       name: 'Lumina EV Battery Works',
       subtitle: 'Volatile Lithium & Cobalt Markets',
-      description: 'Raw materials experience sudden supply swings. Perfect for illustrating why Perpetual LIFO diverges substantially from Periodic LIFO.',
+      description: 'Raw materials experience sudden supply swings. Perfect for illustrating how AVCO Perpetual recalculates moving averages after every single purchase receipt.',
       taxRate: 0.28,
       operatingExpenses: 400,
       currency: '$',
@@ -92,24 +93,25 @@
       ]
     },
     {
-      id: 'steel_liquidation',
-      name: 'Titan Heavy Foundry',
-      subtitle: 'LIFO Liquidation Crisis Case',
-      description: 'A global logistics strike halts incoming steel shipments. The company is forced to liquidate old, cheap base layers established years ago, causing an unexpected tax shock!',
-      taxRate: 0.30,
-      operatingExpenses: 500,
+      id: 'titan_turnover',
+      name: 'Titan Heavy Industries Ltd',
+      subtitle: 'Rapid Inventory Turnover & Moving Average',
+      description: 'Heavy equipment components with staggered deliveries and large production batch issues. Demonstrates the contrast between AVCO Periodic and AVCO Perpetual moving average.',
+      taxRate: 0.25,
+      operatingExpenses: 350,
       currency: '$',
       transactions: [
-        { id: '2026-06-01', type: 'BEGINNING', units: 150, unitCost: 40, notes: 'Ancient base stock layer (Year 2020 cost)' },
-        { id: '2026-06-05', type: 'PURCHASE', units: 50, unitCost: 90, notes: 'Small high-cost spot purchase' },
-        { id: '2026-06-12', type: 'SALE', units: 120, unitPrice: 130, notes: 'Major bridge project dispatch' },
-        { id: '2026-06-20', type: 'SALE', units: 60, unitPrice: 135, notes: 'Liquidation into base layer!' }
+        { id: '2026-06-01', type: 'BEGINNING', units: 100, unitCost: 40, notes: 'Opening components reserve' },
+        { id: '2026-06-05', type: 'PURCHASE', units: 100, unitCost: 60, notes: 'Staggered foundry delivery' },
+        { id: '2026-06-12', type: 'SALE', units: 120, unitPrice: 110, notes: 'Major turbine production run' },
+        { id: '2026-06-18', type: 'PURCHASE', units: 80, unitCost: 80, notes: 'Mid-month replenishment' },
+        { id: '2026-06-25', type: 'SALE', units: 90, unitPrice: 120, notes: 'Generator assembly dispatch' }
       ]
     }
   ];
 
   // 4. Warehouse Dispatcher Practice Order Bank
-  // Interactive mini-missions where user picks pallets to fulfill specific orders under a specific method
+  // Interactive mini-missions where user picks pallets to fulfill specific orders under FIFO Perpetual
   const DISPATCH_MISSIONS = [
     {
       id: 'dispatch_1',
@@ -133,9 +135,9 @@
     },
     {
       id: 'dispatch_2',
-      title: 'Mission 2: Real-time LIFO Priority',
-      mandateMethod: 'LIFO_PERPETUAL',
-      mandateLabel: 'LIFO Perpetual System',
+      title: 'Mission 2: Dual-tier FIFO Dispatch',
+      mandateMethod: 'FIFO_PERPETUAL',
+      mandateLabel: 'FIFO Perpetual System',
       customer: 'Skyline Aerospace',
       orderUnits: 40,
       salesPricePerUnit: 32,
@@ -145,15 +147,15 @@
         { batchId: 'B-12', date: 'Nov 17', units: 20, unitCost: 22 }
       ],
       correctSelection: [
-        { batchId: 'B-12', units: 20, unitCost: 22 }, // 20 * 22 = 440
-        { batchId: 'B-11', units: 20, unitCost: 19 }  // 20 * 19 = 380
+        { batchId: 'B-10', units: 30, unitCost: 14 }, // 30 * 14 = 420
+        { batchId: 'B-11', units: 10, unitCost: 19 }  // 10 * 19 = 190
       ],
-      correctCogs: 820,
-      hint: 'In LIFO Perpetual, take from the MOST RECENT batch on hand (Nov 17, 20 units), then go backwards to Nov 09 (take 20 units).'
+      correctCogs: 610,
+      hint: 'In FIFO Perpetual, take from the OLDEST batch on hand first (all 30 units from Nov 02 @ $14), then take the remaining 10 units from Nov 09 @ $19. Total COGS = $420 + $190 = $610.'
     },
     {
       id: 'dispatch_3',
-      title: 'Mission 3: Dual Batch Depletion under FIFO',
+      title: 'Mission 3: Multi-layer FIFO Fulfillment',
       mandateMethod: 'FIFO_PERPETUAL',
       mandateLabel: 'FIFO Perpetual System',
       customer: 'Summit Hospital Supplies',
@@ -174,9 +176,9 @@
     },
     {
       id: 'dispatch_4',
-      title: 'Mission 4: Stack Pull under LIFO',
-      mandateMethod: 'LIFO_PERPETUAL',
-      mandateLabel: 'LIFO Perpetual System',
+      title: 'Mission 4: Large Batch Fulfillment under FIFO',
+      mandateMethod: 'FIFO_PERPETUAL',
+      mandateLabel: 'FIFO Perpetual System',
       customer: 'Pacific Logistics Hub',
       orderUnits: 30,
       salesPricePerUnit: 60,
@@ -186,11 +188,10 @@
         { batchId: 'PAL-C', date: 'Jan 22', units: 10, unitCost: 48 }
       ],
       correctSelection: [
-        { batchId: 'PAL-C', units: 10, unitCost: 48 }, // 10 * 48 = 480
-        { batchId: 'PAL-B', units: 20, unitCost: 42 }  // 20 * 42 = 840
+        { batchId: 'PAL-A', units: 30, unitCost: 35 } // 30 * 35 = 1050
       ],
-      correctCogs: 1320,
-      hint: 'LIFO takes newest PAL-C first (10 units @ $48), then 20 units from PAL-B (@ $42). Total COGS = $480 + $840 = $1,320.'
+      correctCogs: 1050,
+      hint: 'Under FIFO, allocate 30 units from the oldest available batch PAL-A (Jan 05, unit cost $35). Total COGS = 30 * $35 = $1,050.'
     },
     {
       id: 'dispatch_5',
@@ -232,17 +233,17 @@
     {
       id: 'q2',
       scenarioTitle: 'Vanguard Trading Co. (Quarter 1)',
-      narrative: 'Same data: COGAS = 200 units at total cost of $3,660. Total units sold = 130 units.',
-      targetMethod: 'LIFO_PERIODIC',
-      questionText: 'Under LIFO Periodic, what is the Cost of Goods Sold (COGS) for the quarter?',
+      narrative: 'Same data: Total Cost of Goods Available for Sale (COGAS) = 200 units at total cost of $3,660. Total units sold = 130 units.',
+      targetMethod: 'AVCO_PERIODIC',
+      questionText: 'Under AVCO Periodic (Weighted Average Cost), what is the Cost of Goods Sold (COGS) for the quarter?',
       options: [
-        '$2,200',
-        '$2,580',
+        '$2,379',
         '$2,460',
-        '$2,760'
+        '$2,200',
+        '$2,580'
       ],
-      correctIndex: 1,
-      explanation: 'Under LIFO Periodic, ending inventory (70 units) comes from the OLDEST costs: 60 units @ $15 (Beginning) = $900 + 10 units @ $18 (Jan 15) = $180. Ending Inventory = $1,080. Therefore COGS = Total COGAS ($3,660) - Ending Inventory ($1,080) = $2,580.'
+      correctIndex: 0,
+      explanation: 'Total COGAS = $3,660 across 200 units. Weighted Average Cost per unit = $3,660 / 200 = $18.30. COGS = 130 units sold * $18.30 = $2,379. (Ending inventory = 70 units * $18.30 = $1,281).'
     },
     {
       id: 'q3',
@@ -261,38 +262,38 @@
     },
     {
       id: 'q4',
-      scenarioTitle: 'LIFO Perpetual Timing Analysis',
-      narrative: 'Jan 1: 50 units @ $10. Jan 10: Sold 30 units. Jan 15: Purchased 40 units @ $16. Jan 20: Sold 35 units.',
-      targetMethod: 'LIFO_PERPETUAL',
-      questionText: 'Under LIFO Perpetual, what is the COGS recorded specifically for the sale on Jan 20?',
+      scenarioTitle: 'AVCO Perpetual Moving Average Step-by-Step',
+      narrative: 'Jan 1: 50 units @ $10 ($500). Jan 10: Sold 30 units. Jan 15: Purchased 40 units @ $16 ($640). Jan 20: Sold 35 units.',
+      targetMethod: 'AVCO_PERPETUAL',
+      questionText: 'Under AVCO Perpetual (Moving Weighted Average), what is the COGS recorded for the sale on Jan 20?',
       options: [
+        '$490',
         '$560',
-        '$450',
         '$350',
-        '$510'
+        '$420'
       ],
       correctIndex: 0,
-      explanation: 'On Jan 20, the inventory on hand consists of 20 units @ $10 (remaining from Jan 1) and 40 units @ $16 (from Jan 15). LIFO Perpetual takes the most recent acquisition first: 35 units @ $16 = $560.'
+      explanation: 'After the Jan 10 sale, 20 units remain @ $10 ($200). On Jan 15, adding 40 units @ $16 ($640) gives 60 units with total cost $840 ($200 + $640). Moving average rate = $840 / 60 = $14.00/unit. The Jan 20 sale of 35 units is costed at $14.00 = 35 * $14 = $490!'
     },
     {
       id: 'q5',
-      scenarioTitle: 'LIFO Reserve & Tax Shielding',
-      narrative: 'A US corporation reports FIFO Ending Inventory of $850,000 and LIFO Ending Inventory of $620,000. Corporate income tax rate is 25%.',
-      targetMethod: 'LIFO_RESERVE',
-      questionText: 'What is the LIFO Reserve, and how much cumulative income tax has the corporation shielded by using LIFO?',
+      scenarioTitle: 'IAS 2 Permitted Valuation Methods',
+      narrative: 'An ACCA student is preparing financial statements in compliance with IFRS (International Financial Reporting Standards).',
+      targetMethod: 'IFRS_STANDARDS',
+      questionText: 'Under IAS 2 (Inventories), which cost flow assumptions are explicitly permitted for interchangeable inventory items?',
       options: [
-        'LIFO Reserve: $230,000 | Tax Shielded: $57,500',
-        'LIFO Reserve: $230,000 | Tax Shielded: $230,000',
-        'LIFO Reserve: $140,000 | Tax Shielded: $35,000',
-        'LIFO Reserve: $850,000 | Tax Shielded: $212,500'
+        'FIFO (First-In, First-Out) and Weighted Average Cost (AVCO) only',
+        'FIFO and LIFO only',
+        'LIFO and Base Stock method only',
+        'Standard costing with periodic LIFO reconciliation'
       ],
       correctIndex: 0,
-      explanation: 'LIFO Reserve = FIFO Inventory ($850,000) - LIFO Inventory ($620,000) = $230,000. By carrying higher historical COGS of $230,000 under LIFO, taxable income was reduced by $230,000. Tax saved = $230,000 * 25% = $57,500.'
+      explanation: 'Under IAS 2 paragraph 25, the cost of inventories that are ordinarily interchangeable shall be assigned by using either the FIFO (First-In, First-Out) formula or the Weighted Average Cost (AVCO) formula. LIFO is strictly prohibited.'
     },
     {
       id: 'q6',
-      scenarioTitle: 'IFRS vs US GAAP Regulatory Mandates',
-      narrative: 'A multinational entity prepares financial statements in compliance with IFRS (International Financial Reporting Standards).',
+      scenarioTitle: 'IAS 2 Prohibited Cost Formula',
+      narrative: 'A multinational entity prepares financial statements in compliance with IFRS.',
       targetMethod: 'IFRS_STANDARDS',
       questionText: 'Under IAS 2 (Inventories), which cost flow assumption is STRICTLY PROHIBITED?',
       options: [
@@ -302,97 +303,129 @@
         'Specific Identification'
       ],
       correctIndex: 2,
-      explanation: 'Under IAS 2, LIFO is prohibited because it does not reflect realistic physical flow of goods and understates inventory values on the Statement of Financial Position with stale, outdated historical costs. US GAAP permits LIFO under ASC 330.'
+      explanation: 'Under IAS 2, LIFO is prohibited because it does not reflect realistic physical flow of goods and leaves outdated historical costs on the Statement of Financial Position, understating inventory carrying values. US GAAP permits LIFO under ASC 330.'
     },
     {
       id: 'q7',
-      scenarioTitle: 'LIFO Liquidation Mechanics',
-      narrative: 'Due to a supplier strike, a company cannot restock inventory and sells 5,000 units that dip into a 15-year-old base layer purchased at $8/unit. Current replacement cost is $45/unit.',
-      targetMethod: 'LIFO_LIQUIDATION',
-      questionText: 'What is the financial statement effect of this LIFO liquidation?',
+      scenarioTitle: 'AVCO Price Smoothing Effect in Inflation',
+      narrative: 'Throughout the accounting year, raw material acquisition costs rose by 25%. The CFO evaluates FIFO versus AVCO.',
+      targetMethod: 'AVCO_SMOOTHING',
+      questionText: 'During persistent inflation, how do AVCO gross profit and ending inventory compare to FIFO?',
       options: [
-        'COGS will be unusually high, leading to an operating loss and tax refund.',
-        'COGS will be artificially low, causing a phantom profit surge and higher tax liability.',
-        'Ending inventory value will increase to current fair market value.',
-        'The LIFO Reserve will increase significantly.'
+        'AVCO reports lower gross profit and lower ending inventory than FIFO, smoothing earnings fluctuations.',
+        'AVCO reports higher gross profit and higher ending inventory than FIFO.',
+        'AVCO reports identical gross profit to FIFO but higher ending inventory.',
+        'AVCO produces negative gross margin because of average rates.'
       ],
-      correctIndex: 1,
-      explanation: 'LIFO liquidation matches stale, low historical costs ($8) against high current sales prices. This drastically lowers COGS, artificially inflates gross profit and taxable income ("phantom profits"), resulting in a sudden, punitive tax cash outflow.'
+      correctIndex: 0,
+      explanation: 'In an inflationary cycle, FIFO assigns older, cheaper costs to COGS (maximizing gross profit) and recent expensive costs to ending inventory (maximizing assets). AVCO blends old and new costs, producing moderate/smoothed COGS, lower gross profit, and lower ending inventory than FIFO.'
     },
     {
       id: 'q8',
       scenarioTitle: 'Deflationary Environment Reversal',
-      narrative: 'A retailer operates in a deflationary tech electronics market where component acquisition costs fall by 10% every month.',
+      narrative: 'A technology distributor operates in a deflationary electronics market where replacement costs fall each month.',
       targetMethod: 'DEFLATION_STRATEGY',
-      questionText: 'Under persistent DEFLATION, which inventory valuation method produces the HIGHEST Net Income?',
+      questionText: 'Under persistent DEFLATION, which permitted method under IAS 2 produces the LOWER Cost of Goods Sold (and thus HIGHER Gross Profit)?',
       options: [
-        'LIFO (both Periodic and Perpetual)',
-        'FIFO Periodic only',
-        'FIFO Perpetual only',
-        'Both FIFO and LIFO produce identical results under deflation'
+        'AVCO produces lower COGS (and higher gross profit) than FIFO because FIFO sends older, higher costs to COGS first.',
+        'FIFO produces lower COGS than AVCO because older stock is always cheaper.',
+        'Both FIFO and AVCO produce identical gross profit under falling prices.',
+        'IAS 2 requires write-downs that eliminate all differences between FIFO and AVCO.'
       ],
       correctIndex: 0,
-      explanation: 'Under falling costs (deflation), the latest purchases are CHEAPER than opening stock. LIFO assigns the latest cheap costs to COGS, resulting in LOWER COGS and therefore HIGHER Gross Profit and HIGHER Net Income than FIFO.'
+      explanation: 'Under falling costs (deflation), older stock is MORE expensive than new stock. FIFO sends that older, expensive stock directly to COGS, increasing COGS and decreasing profit. AVCO averages down the cost with cheaper purchases, resulting in lower COGS and higher gross profit than FIFO!'
+    },
+    {
+      id: 'q9',
+      scenarioTitle: 'AVCO Periodic Weighted Average Calculation',
+      narrative: 'Beginning inventory: 100 units @ $10 ($1,000). Purchases: 200 units @ $16 ($3,200). 180 units were sold during the month.',
+      targetMethod: 'AVCO_PERIODIC',
+      questionText: 'Under AVCO Periodic (Weighted Average Cost), what is the Cost of Goods Sold (COGS) for the month?',
+      options: [
+        '$2,520',
+        '$2,880',
+        '$2,160',
+        '$2,400'
+      ],
+      correctIndex: 0,
+      explanation: 'Total COGAS = $1,000 + $3,200 = $4,200. Total units available = 100 + 200 = 300 units. Weighted Average Cost per unit = $4,200 / 300 = $14.00. COGS = 180 units sold * $14.00 = $2,520. (Ending inventory = 120 units * $14.00 = $1,680).'
+    },
+    {
+      id: 'q10',
+      scenarioTitle: 'AVCO Perpetual Moving Average Dynamics',
+      narrative: 'Opening stock: 40 units @ $10 ($400). Day 4: Bought 60 units @ $15 ($900). Day 8: Sold 50 units. Day 12: Bought 50 units @ $20 ($1,000).',
+      targetMethod: 'AVCO_PERPETUAL',
+      questionText: 'Under AVCO Perpetual, what was the unit cost applied to the Day 8 sale, and what is the new average unit cost after the Day 12 purchase?',
+      options: [
+        'Day 8 Sale: $13.00/unit | Day 12 New Rate: $16.50/unit',
+        'Day 8 Sale: $12.50/unit | Day 12 New Rate: $15.00/unit',
+        'Day 8 Sale: $15.00/unit | Day 12 New Rate: $20.00/unit',
+        'Day 8 Sale: $10.00/unit | Day 12 New Rate: $14.50/unit'
+      ],
+      correctIndex: 0,
+      explanation: 'Before Day 8 sale: Balance = 40 + 60 = 100 units, total cost $400 + $900 = $1,300. Moving average rate = $1,300 / 100 = $13.00/unit. Day 8 sale is costed at $13.00 (50 * $13 = $650). Remaining balance on Day 8 = 50 units @ $13.00 ($650). On Day 12, adding 50 units @ $20 ($1,000) gives 100 units at total cost $650 + $1,000 = $1,650. New moving average rate = $1,650 / 100 = $16.50/unit!'
     }
   ];
 
-  // 6. Comprehensive Educational Cheat Sheet & Reference
+  // 6. Comprehensive Educational Reference Matrix
   const REFERENCE_GUIDE = {
-    overview: 'Inventory valuation is the accounting process of assigning monetary value to unsold inventory and Cost of Goods Sold (COGS). The two principal cost flow assumptions are FIFO and LIFO, operated under either a Periodic or Perpetual system.',
+    overview: 'Inventory valuation is the accounting process of assigning monetary value to unsold inventory and Cost of Goods Sold (COGS). Under IAS 2 (Inventories), the two permitted cost flow assumptions for interchangeable goods are FIFO and AVCO (Weighted Average Cost), operated under either a Periodic or Perpetual system.',
     coreFormula: 'Cost of Goods Available for Sale (COGAS) = Beginning Inventory + Net Purchases during the period.\nEnding Inventory + Cost of Goods Sold = COGAS.',
+    avcoFormulas: {
+      periodic: 'AVCO Periodic Rate = Total Cost of Opening Stock + Total Purchases Cost / Total Available Units (Calculated at period-end)',
+      perpetual: 'AVCO Perpetual (Moving Average) Rate = (Existing Balance Cost + Receipt Cost) / (Existing Balance Units + Receipt Units) (Recalculated on every purchase receipt)'
+    },
     comparisonMatrix: [
       {
         attribute: 'Cost Flow Logic',
         fifoPeriodic: 'Latest purchases form ending inventory; earliest form COGS.',
         fifoPerpetual: 'Earliest layers on hand at time of sale are depleted continuously.',
-        lifoPeriodic: 'Earliest purchases form ending inventory; latest period purchases form COGS.',
-        lifoPerpetual: 'Most recent layers on hand at exact moment of sale are depleted.'
+        avcoPeriodic: 'Single weighted average rate across all goods available in the period.',
+        avcoPerpetual: 'Moving weighted average unit rate recalculated after each receipt.'
       },
       {
         attribute: 'Result Equivalence',
         fifoPeriodic: 'Identical to FIFO Perpetual.',
         fifoPerpetual: 'Identical to FIFO Periodic.',
-        lifoPeriodic: 'Usually differs from LIFO Perpetual if purchases occur after sales.',
-        lifoPerpetual: 'Usually differs from LIFO Periodic due to point-in-time constraints.'
+        avcoPeriodic: 'Usually differs from AVCO Perpetual because timing of receipts matters.',
+        avcoPerpetual: 'Differs from AVCO Periodic as rates change before each sale.'
       },
       {
         attribute: 'Inflation: Ending Inventory',
-        fifoPeriodic: 'Highest (current replacement prices)',
+        fifoPeriodic: 'Highest (valued at most recent prices)',
         fifoPerpetual: 'Highest (identical to Periodic)',
-        lifoPeriodic: 'Lowest (stale old prices)',
-        lifoPerpetual: 'Intermediate/Low'
+        avcoPeriodic: 'Moderate (weighted average of all prices)',
+        avcoPerpetual: 'Moderate (moving average of purchases)'
       },
       {
         attribute: 'Inflation: COGS',
-        fifoPeriodic: 'Lowest (older cheaper costs)',
+        fifoPeriodic: 'Lowest (earliest cheaper costs)',
         fifoPerpetual: 'Lowest (identical to Periodic)',
-        lifoPeriodic: 'Highest (most recent expensive costs)',
-        lifoPerpetual: 'High (most recent available at sale)'
+        avcoPeriodic: 'Moderate (weighted average)',
+        avcoPerpetual: 'Moderate (moving average at sale time)'
       },
       {
-        attribute: 'Inflation: Net Income & Tax',
-        fifoPeriodic: 'Highest Net Income, Highest Tax',
-        fifoPerpetual: 'Highest Net Income, Highest Tax',
-        lifoPeriodic: 'Lowest Net Income, Lowest Tax (Tax Shield)',
-        lifoPerpetual: 'Lower Net Income, Lower Tax'
+        attribute: 'Inflation: Net Income',
+        fifoPeriodic: 'Highest Gross Profit & Net Income',
+        fifoPerpetual: 'Highest Gross Profit & Net Income',
+        avcoPeriodic: 'Moderate / Smoothed Net Income',
+        avcoPerpetual: 'Moderate / Smoothed Net Income'
       },
       {
         attribute: 'IFRS Compliance (IAS 2)',
-        fifoPeriodic: 'PERMITTED',
-        fifoPerpetual: 'PERMITTED',
-        lifoPeriodic: 'PROHIBITED',
-        lifoPerpetual: 'PROHIBITED'
+        fifoPeriodic: 'PERMITTED (IAS 2.25)',
+        fifoPerpetual: 'PERMITTED (IAS 2.25)',
+        avcoPeriodic: 'PERMITTED (IAS 2.25)',
+        avcoPerpetual: 'PERMITTED (IAS 2.25)'
       },
       {
         attribute: 'US GAAP Compliance (ASC 330)',
         fifoPeriodic: 'PERMITTED',
         fifoPerpetual: 'PERMITTED',
-        lifoPeriodic: 'PERMITTED (subject to conformity rule)',
-        lifoPerpetual: 'PERMITTED (subject to conformity rule)'
+        avcoPeriodic: 'PERMITTED',
+        avcoPerpetual: 'PERMITTED'
       }
     ],
-    lifoConformityRule: 'Under US Internal Revenue Code (IRC § 472), if a company uses LIFO for its tax returns to reduce taxable income, it MUST also use LIFO for its financial statements to shareholders and creditors. This prevents companies from showing low profits to the IRS and high profits to investors.',
-    lifoReserveDefinition: 'The LIFO Reserve is the contra-asset allowance representing the cumulative difference between inventory valued under FIFO and inventory valued under LIFO: LIFO Reserve = FIFO Ending Inventory - LIFO Ending Inventory.',
     journalEntries: {
       perpetual: [
         'On Purchase: Dr Inventory, Cr Accounts Payable / Cash',

@@ -515,11 +515,291 @@ const EXAM_TRAP_BLITZ_QUESTIONS = [
   }
 ];
 
+const PPE_CHAPTER8_DATA = {
+  capitalVsRevenue: [
+    {
+      id: 'cvr_1',
+      description: 'Carriage inwards delivery costs for transporting a new CNC cutting machine to the factory.',
+      category: 'CAPITAL',
+      categoryLabel: 'Capital Expenditure (PPE - SOFP)',
+      explanation: 'Under IAS 16, directly attributable costs of bringing the asset to its working condition for intended use must be capitalized as part of PPE cost.'
+    },
+    {
+      id: 'cvr_2',
+      description: 'Special reinforced concrete foundation and electrical wiring installed specifically for the CNC machine.',
+      category: 'CAPITAL',
+      categoryLabel: 'Capital Expenditure (PPE - SOFP)',
+      explanation: 'Site preparation, foundations, and direct electrical installation are essential to operate the asset and are capitalized per IAS 16.'
+    },
+    {
+      id: 'cvr_3',
+      description: 'Professional fees paid to consulting engineers to test-run and calibrate the CNC machine before commencing commercial production.',
+      category: 'CAPITAL',
+      categoryLabel: 'Capital Expenditure (PPE - SOFP)',
+      explanation: 'Costs of testing whether the asset is functioning properly (net of any sample sales proceeds) are capital expenditure.'
+    },
+    {
+      id: 'cvr_4',
+      description: 'Legal conveyancing fees and stamp duty paid when purchasing a freehold warehouse property.',
+      category: 'CAPITAL',
+      categoryLabel: 'Capital Expenditure (PPE - SOFP)',
+      explanation: 'Professional legal fees and transaction taxes incurred directly to acquire title are capital expenditure added to property cost.'
+    },
+    {
+      id: 'cvr_5',
+      description: 'Initial estimated present value of site restoration and machine dismantling costs required by environmental law at the end of its 10-year life.',
+      category: 'CAPITAL',
+      categoryLabel: 'Capital Expenditure (PPE - SOFP)',
+      explanation: 'IAS 16 mandates capitalizing the initial estimate of dismantling, removing, and restoring the site as part of the asset cost, with a corresponding provision liability.'
+    },
+    {
+      id: 'cvr_6',
+      description: 'Costs of an intensive 3-day training course for machine operators to learn the new CNC software.',
+      category: 'REVENUE',
+      categoryLabel: 'Revenue Expenditure (SPL Expense)',
+      explanation: 'IAS 16 explicitly excludes staff training from PPE cost! Staff are not controlled assets of the entity; training is expensed immediately to SPL.'
+    },
+    {
+      id: 'cvr_7',
+      description: 'Routine annual maintenance, lubrication, and replacement of minor worn belts on the factory machines.',
+      category: 'REVENUE',
+      categoryLabel: 'Revenue Expenditure (SPL Expense)',
+      explanation: 'Day-to-day servicing and maintenance merely maintain the asset’s existing standard of performance and must be expensed as incurred.'
+    },
+    {
+      id: 'cvr_8',
+      description: 'Annual commercial fire, theft, and flood insurance policy covering the factory premises and machinery.',
+      category: 'REVENUE',
+      categoryLabel: 'Revenue Expenditure (SPL Expense)',
+      explanation: 'Operational insurance is a recurring administration/factory overhead, not an acquisition cost of bringing the asset into working condition.'
+    },
+    {
+      id: 'cvr_9',
+      description: 'Repainting the exterior walls of the administration offices and decorating customer meeting rooms.',
+      category: 'REVENUE',
+      categoryLabel: 'Revenue Expenditure (SPL Expense)',
+      explanation: 'Cosmetic decorating and repainting are routine property maintenance expenses charged to the Statement of Profit or Loss.'
+    },
+    {
+      id: 'cvr_10',
+      description: 'Repair costs incurred when a forklift truck accidentally dropped and damaged the machine during unloading.',
+      category: 'REVENUE',
+      categoryLabel: 'Revenue Expenditure (SPL Expense)',
+      explanation: 'Accidental damage repairs and abnormal waste are NOT necessary costs of bringing the asset to working condition. They must be expensed as an operating loss.'
+    }
+  ],
+  depreciationScenarios: [
+    {
+      id: 'dep_sl',
+      name: 'Straight-Line Method (IAS 16)',
+      assetName: 'Industrial Printing Press',
+      cost: 60000,
+      residualValue: 6000,
+      usefulLifeYears: 5,
+      formula: '(Cost − Residual Value) / Useful Life',
+      annualDepreciation: 10800, // (60000 - 6000) / 5
+      year1CarryingAmount: 49200,
+      year2Depreciation: 10800,
+      year2CarryingAmount: 38400,
+      rule: 'Straight-line allocates an equal depreciation charge each full financial year throughout the asset useful life.'
+    },
+    {
+      id: 'dep_rb',
+      name: 'Reducing Balance Method (IAS 16)',
+      assetName: 'Executive Fleet Vehicles',
+      cost: 40000,
+      depreciationRatePct: 25,
+      formula: 'Carrying Amount × Depreciation %',
+      year1Depreciation: 10000, // 25% of 40,000
+      year1CarryingAmount: 30000,
+      year2Depreciation: 7500,  // 25% of 30,000
+      year2CarryingAmount: 22500,
+      rule: 'Under reducing balance, the percentage is applied to the CARRYING AMOUNT (Cost − Accumulated Depreciation). Residual value is ignored in the annual calculation.'
+    },
+    {
+      id: 'dep_prorata',
+      name: 'Part-Year Pro-Rata Depreciation',
+      assetName: 'Warehouse Forklift',
+      cost: 24000,
+      usefulLifeYears: 4,
+      residualValue: 0,
+      acquisitionDate: '1 October 20X5',
+      yearEnd: '31 December 20X5',
+      monthsOwnedInYear1: 3,
+      year1Depreciation: 1500, // (24000 / 4) * (3 / 12)
+      year1CarryingAmount: 22500,
+      rule: 'Under pro-rata policy, depreciation is charged only for the portion of the year the asset was owned and available for use (3 months / 12 months).'
+    }
+  ],
+  revaluationScenarios: [
+    {
+      id: 'reval_1',
+      title: 'Freehold Land & Headquarters Revaluation',
+      originalCost: 200000,
+      accumulatedDepreciationBeforeReval: 40000,
+      carryingAmountBeforeReval: 160000,
+      newFairValuation: 260000,
+      revaluationSurplus: 100000, // 260,000 - 160,000
+      originalLifeYears: 50,
+      yearsElapsed: 10,
+      remainingLifeYears: 40,
+      revisedAnnualDepreciation: 6500, // 260,000 / 40
+      historicalAnnualDepreciation: 4000, // 200,000 / 50
+      annualExcessDepreciationTransfer: 2500, // 6,500 - 4,000
+      journalEntries: [
+        'Step 1: Dr Accumulated Depreciation £40,000, Cr PPE Asset Valuation £40,000 (Eliminate accumulated depreciation)',
+        'Step 2: Dr PPE Asset Valuation £100,000, Cr Revaluation Surplus (Equity / OCI) £100,000 (Record surplus)',
+        'Step 3: Annual Depreciation: Dr Depreciation Expense (SPL) £6,500, Cr Accumulated Depreciation £6,500',
+        'Step 4: Optional Reserves Transfer: Dr Revaluation Surplus £2,500, Cr Retained Earnings £2,500'
+      ],
+      rule: 'Upward revaluation is recognized in Other Comprehensive Income (OCI) and accumulated in the Revaluation Surplus reserve in equity. An annual transfer of excess depreciation to Retained Earnings is permitted.'
+    }
+  ],
+  disposalScenarios: [
+    {
+      id: 'disp_1',
+      title: 'Disposal of Delivery Van with Cash Proceeds',
+      originalCost: 25000,
+      accumulatedDepreciation: 18000,
+      carryingAmountAtDisposal: 7000, // 25,000 - 18,000
+      cashSaleProceeds: 8500,
+      resultType: 'PROFIT',
+      gainLossAmount: 1500, // 8,500 - 7,000 = Profit £1,500
+      tAccountSteps: [
+        '1. Dr Asset Disposal Account £25,000 | Cr Motor Vehicles at Cost £25,000 (Remove original cost)',
+        '2. Dr Accumulated Depreciation £18,000 | Cr Asset Disposal Account £18,000 (Remove accumulated depn)',
+        '3. Dr Bank Account £8,500 | Cr Asset Disposal Account £8,500 (Record cash proceeds received)',
+        '4. Balancing plug: Dr Asset Disposal Account £1,500 | Cr Statement of Profit or Loss (Profit on Disposal) £1,500'
+      ],
+      rule: 'If disposal proceeds exceed carrying amount, a PROFIT on disposal is credited to SPL. If proceeds are less than carrying amount, a LOSS on disposal is debited to SPL.'
+    },
+    {
+      id: 'disp_2',
+      title: 'Disposal of Equipment via Part-Exchange Trade-In',
+      originalCost: 32000,
+      accumulatedDepreciation: 22000,
+      carryingAmountAtDisposal: 10000, // 32,000 - 22,000
+      partExchangeAllowance: 7500, // Agreed trade-in value against new machine
+      cashPaidForNewMachine: 37500,
+      newMachineCost: 45000, // 37,500 cash + 7,500 trade-in
+      resultType: 'LOSS',
+      gainLossAmount: 2500, // 10,000 carrying amount - 7,500 allowance = Loss £2,500
+      tAccountSteps: [
+        '1. Dr Asset Disposal Account £32,000 | Cr Equipment at Cost £32,000',
+        '2. Dr Accumulated Depreciation £22,000 | Cr Asset Disposal Account £22,000',
+        '3. Dr New Equipment at Cost £7,500 | Cr Asset Disposal Account £7,500 (Trade-in allowance)',
+        '4. Balancing plug: Dr Statement of Profit or Loss (Loss on Disposal) £2,500 | Cr Asset Disposal Account £2,500'
+      ],
+      rule: 'Part-exchange trade-in allowance represents the disposal proceeds of the old asset and is credited to the Disposal Account. New asset is capitalized at full invoice cost (Trade-in + Cash).'
+    }
+  ]
+};
+
+const ACCRUALS_PREPAYMENTS_DATA = [
+  {
+    id: 'acc_1',
+    title: 'Property Rent Expense Account',
+    accountName: 'Rent Expense',
+    nature: 'EXPENSE',
+    openingPrepayment: 600,   // Paid in prior year for current year (Debit b/d)
+    openingAccrual: 0,
+    cashPaidDuringYear: 7800,  // Bank payments debited to Rent (Dr Rent, Cr Bank)
+    closingPrepayment: 900,   // Paid this year relating to next year (Credit c/d, balance b/d as Asset)
+    closingAccrual: 0,
+    // Workings: Opening Prepayment (600) + Cash Paid (7800) - Closing Prepayment (900) = £7,500
+    splCharge: 7500,
+    sofpBalance: 900,
+    sofpCategory: 'Current Asset (Prepayments)',
+    explanation: 'Opening prepayment of £600 brought forward is added as it relates to this year. Closing prepayment of £900 is deducted and carried forward as a Current Asset into next year. SPL charge = £600 + £7,800 − £900 = £7,500.'
+  },
+  {
+    id: 'acc_2',
+    title: 'Electricity & Utilities Expense Account',
+    accountName: 'Electricity Expense',
+    nature: 'EXPENSE',
+    openingPrepayment: 0,
+    openingAccrual: 450,       // Consumed prior year, paid this year (Credit b/d)
+    cashPaidDuringYear: 3600,  // Paid during year
+    closingPrepayment: 0,
+    closingAccrual: 620,       // Estimated electricity consumed in Q4, unbilled (Debit to Rent, Credit c/d to Accruals)
+    // Workings: Cash Paid (3600) - Opening Accrual (450) + Closing Accrual (620) = £3,770
+    splCharge: 3770,
+    sofpBalance: 620,
+    sofpCategory: 'Current Liability (Accruals)',
+    explanation: 'Opening accrual of £450 relates to last year and is deducted. Closing accrual of £620 was consumed this year and is added to SPL and recognized as a Current Liability on SOFP. SPL charge = £3,600 − £450 + £620 = £3,770.'
+  },
+  {
+    id: 'acc_3',
+    title: 'Sublet Warehouse Rental Income Account',
+    accountName: 'Rental Income',
+    nature: 'INCOME',
+    openingAccruedIncome: 800,   // Earned last year, collected this year (Debit b/d)
+    openingDeferredIncome: 0,
+    cashReceivedDuringYear: 9600, // Received in bank (Dr Bank, Cr Rental Income)
+    closingAccruedIncome: 0,
+    closingDeferredIncome: 1200,  // Tenant paid 2 months in advance (Credit c/d, Liability)
+    // Workings: Cash Received (9600) - Opening Accrued (800) - Closing Deferred (1200) = £7,600
+    splCharge: 7600,
+    sofpBalance: 1200,
+    sofpCategory: 'Current Liability (Deferred Income)',
+    explanation: 'Tenant paid £1,200 in advance for the next financial year. This is deferred income (Current Liability). SPL rental income recognized = £9,600 − £800 − £1,200 = £7,600.'
+  }
+];
+
+const IRRECOVERABLE_DEBTS_DATA = [
+  {
+    id: 'debts_case_1',
+    title: 'Year-End Receivables Audit & Allowance Adjustment',
+    narrative: 'At 31 December 20X6, total Trade Receivables per the sales ledger ledger stand at £64,000. Before closing the books, the following adjustments are required:\n1. A credit customer who owed £4,000 has been declared bankrupt; this debt is confirmed irrecoverable and must be written off.\n2. Management policy is to maintain an allowance for receivables equal to 5% of remaining trade receivables.\n3. The balance brought forward on the Allowance for Receivables from last year was £2,500.',
+    grossReceivables: 64000,
+    irrecoverableDebtWriteOff: 4000,
+    adjustedReceivables: 60000, // 64,000 - 4,000
+    allowancePercentage: 5,
+    requiredClosingAllowance: 3000, // 5% of 60,000
+    openingAllowance: 2500,
+    allowanceAdjustmentType: 'INCREASE',
+    allowanceAdjustmentAmount: 500, // 3,000 - 2,500 = £500 increase (Expense)
+    totalSplCharge: 4500, // 4,000 written off + 500 increase = £4,500
+    sofpNetReceivables: 57000, // 60,000 - 3,000 = £57,000
+    journalEntries: [
+      '1. Write-off: Dr Irrecoverable Debts Expense £4,000 | Cr Trade Receivables £4,000',
+      '2. Allowance Increase: Dr Irrecoverable Debts Expense £500 | Cr Allowance for Receivables £500',
+      '3. Year-end Transfer: Dr Statement of Profit or Loss £4,500 | Cr Irrecoverable Debts Expense £4,500'
+    ],
+    rule: 'Crucial ACCA Rule: The allowance for receivables percentage must ALWAYS be calculated on the balance of receivables AFTER deducting any current-year write-offs!'
+  },
+  {
+    id: 'debts_case_2',
+    title: 'Allowance Reduction & Bad Debt Recovery',
+    narrative: 'At 31 December 20X7, Trade Receivables stand at £80,000 with no new debts to write off.\n1. A customer whose £1,200 debt was written off 2 years ago unexpectedly paid their balance in full by cheque.\n2. The opening balance on the Allowance for Receivables was £4,800.\n3. Management revises the required allowance down to 4% of receivables.',
+    grossReceivables: 80000,
+    irrecoverableDebtWriteOff: 0,
+    adjustedReceivables: 80000,
+    allowancePercentage: 4,
+    requiredClosingAllowance: 3200, // 4% of 80,000
+    openingAllowance: 4800,
+    allowanceAdjustmentType: 'DECREASE',
+    allowanceAdjustmentAmount: 1600, // 4,800 - 3,200 = £1,600 decrease (Credit/Income)
+    debtRecoveredAmount: 1200,
+    netSplImpact: 2800, // £1,600 (allowance decrease) + £1,200 (recovery) = £2,800 total CREDIT (Income)
+    sofpNetReceivables: 76800, // 80,000 - 3,200 = £76,800
+    journalEntries: [
+      '1. Debt Recovery: Dr Bank Account £1,200 | Cr Irrecoverable Debts Recovered (SPL Credit) £1,200',
+      '2. Allowance Decrease: Dr Allowance for Receivables £1,600 | Cr Irrecoverable Debts Expense / SPL £1,600',
+      '3. SOFP: Trade Receivables £80,000 minus Allowance £3,200 = Net Receivables £76,800'
+    ],
+    rule: 'A decrease in the allowance for receivables is credited to the Statement of Profit or Loss, increasing operating profit. Debts recovered are also recognized as income.'
+  }
+];
+
 window.ACCA_DATA = {
   DEAD_CLIC_TRANSACTIONS,
   T_ACCOUNT_CHALLENGES,
   TRIAL_BALANCE_ERRORS,
   STATEMENT_BUILDER_DATA,
   INVENTORY_AND_DEPRECIATION_TASKS,
-  EXAM_TRAP_BLITZ_QUESTIONS
+  EXAM_TRAP_BLITZ_QUESTIONS,
+  PPE_CHAPTER8_DATA,
+  ACCRUALS_PREPAYMENTS_DATA,
+  IRRECOVERABLE_DEBTS_DATA
 };
