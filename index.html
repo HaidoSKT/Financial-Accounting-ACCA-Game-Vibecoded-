@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ACCA Financial Accounting Master (FFA / FA) - Interactive Simulator & Game</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <meta name="description" content="ACCA Financial Accounting interactive educational game with persistent data storage, double-entry simulator, trial balance detective, and financial statements architect.">
+</head>
+<body>
+
+  <!-- APP HEADER & HUD -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="brand-logo" aria-hidden="true">📊</div>
+        <div class="brand-text">
+          <h1>ACCA Accounting Arena</h1>
+          <span class="badge-acca">FFA / FA (F3) Standard Syllabus</span>
+        </div>
+      </div>
+
+      <!-- Live Player Stats HUD -->
+      <div class="hud-bar">
+        <a href="fifo-lifo.html" class="hud-btn" style="background:rgba(2, 132, 199, 0.25); border-color:#38bdf8; color:#38bdf8; text-decoration:none;" title="Play FIFO vs LIFO Master: Perpetual & Periodic Simulator">
+          📦 FIFO/LIFO Game
+        </a>
+
+        <div class="hud-pill xp-pill" title="Player Level & Progression">
+          <span style="font-size:1.1rem;">🎖️</span>
+          <div>
+            <div style="display:flex; justify-content:space-between; gap:0.5rem; font-size:0.75rem;">
+              <span id="hud-level">Lvl 1</span>
+              <span id="hud-xp" style="color:#60a5fa;">0 XP</span>
+            </div>
+            <div id="hud-player-title" style="font-size:0.65rem; color:var(--text-muted); font-weight:normal;">Trainee Bookkeeper</div>
+          </div>
+          <div class="xp-progress-bar" id="hud-xp-bar"></div>
+        </div>
+
+        <div class="hud-pill" title="Earned Marks / Coins">
+          <span>🪙</span>
+          <span class="hud-value" id="hud-coins">50</span>
+          <span style="font-size:0.7rem; color:var(--text-muted);">Marks</span>
+        </div>
+
+        <div class="hud-pill streak" title="Current Combo Multiplier Streak">
+          <span>🔥</span>
+          <span class="hud-value" id="hud-streak">0x</span>
+        </div>
+
+        <button id="btn-sound-toggle" class="hud-btn" title="Toggle Synthesized Audio">
+          🔊 Sound: ON
+        </button>
+
+        <button id="btn-reference" class="hud-btn" title="Open ACCA Cheat Sheet">
+          📖 Cheat Sheet
+        </button>
+
+        <button id="btn-history" class="hud-btn" title="View Audit Trail History">
+          📋 Logs
+        </button>
+
+        <button id="btn-profile" class="hud-btn primary" title="View Badges & Save Data">
+          👤 <span id="hud-player-name">Candidate</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVIGATION TABS -->
+  <nav class="game-nav" aria-label="Game Modes">
+    <button class="nav-tab-btn active" data-tab="deadClic">
+      <span>🎯</span> 1. DEAD CLIC Arena
+    </button>
+    <button class="nav-tab-btn" data-tab="tAccount">
+      <span>⚖️</span> 2. T-Account Balancer
+    </button>
+    <button class="nav-tab-btn" data-tab="detective">
+      <span>🕵️</span> 3. Suspense Detective
+    </button>
+    <button class="nav-tab-btn" data-tab="statements">
+      <span>🏛️</span> 4. Statement Architect
+    </button>
+    <button class="nav-tab-btn" data-tab="inventory">
+      <span>📦</span> 5. IAS 2 & Asset Tycoon
+    </button>
+    <button class="nav-tab-btn" data-tab="blitz">
+      <span>🛡️</span> 6. Exam Trap Blitz
+    </button>
+  </nav>
+
+  <!-- MAIN GAME CONTAINER -->
+  <main class="game-container">
+
+    <!-- MODE 1: DEAD CLIC ARENA -->
+    <section id="section-deadClic" class="mode-section active">
+      <div class="game-card">
+        <div class="game-card-header">
+          <div>
+            <h2 class="game-card-title"><span>🎯</span> DEAD CLIC Speed Debit/Credit Arena</h2>
+            <p class="game-card-subtitle">Rapid double entry classification based on the official ACCA framework.</p>
+          </div>
+          <span id="dc-counter" class="hud-pill" style="align-self:flex-start;">Scenario 1 of 15</span>
+        </div>
+
+        <!-- Mnemonic Guide -->
+        <div class="dead-clic-banner">
+          <div class="mnemonic-box debit">
+            <div class="mnemonic-title"><span>📥</span> DEBIT increases: DEAD</div>
+            <div class="mnemonic-desc">
+              <strong>D</strong>ebit: <strong>E</strong>xpenses, <strong>A</strong>ssets, <strong>D</strong>rawings (Decreases are Credited)
+            </div>
+          </div>
+          <div class="mnemonic-box credit">
+            <div class="mnemonic-title"><span>📤</span> CREDIT increases: CLIC</div>
+            <div class="mnemonic-desc">
+              <strong>C</strong>redit: <strong>L</strong>iabilities, <strong>I</strong>ncome, <strong>C</strong>apital (Decreases are Debited)
+            </div>
+          </div>
+        </div>
+
+        <!-- Scenario Prompt -->
+        <div class="scenario-box">
+          <span class="scenario-tag">ACCA Business Transaction</span>
+          <p id="dc-scenario-text" class="scenario-text">Loading transaction...</p>
+        </div>
+
+        <!-- Dual Column Selectors -->
+        <div class="entry-selector-grid">
+          <div class="selector-column debit-col">
+            <div class="col-header debit">
+              <span>DEBIT LEG (DR)</span>
+              <span style="font-size:0.75rem;">Increases: Exp / Asset / Drawings</span>
+            </div>
+            <div id="dc-debit-choices" class="choice-grid"></div>
+          </div>
+
+          <div class="selector-column credit-col">
+            <div class="col-header credit">
+              <span>CREDIT LEG (CR)</span>
+              <span style="font-size:0.75rem;">Increases: Liab / Income / Capital</span>
+            </div>
+            <div id="dc-credit-choices" class="choice-grid"></div>
+          </div>
+        </div>
+
+        <!-- Action Controls -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+          <button id="dc-btn-submit" class="hud-btn primary" onclick="window.gameEngine.submitDeadClic()" style="padding:0.75rem 1.5rem; font-size:1rem;">
+            Record Double Entry
+          </button>
+          <button id="dc-btn-next" class="hud-btn" onclick="window.gameEngine.nextDeadClic()" style="display:none; padding:0.75rem 1.5rem; font-size:1rem; background:#10b981; color:white; border-color:#059669;">
+            Next Transaction ➔
+          </button>
+        </div>
+
+        <!-- Feedback & Trap Alert -->
+        <div id="dc-feedback" class="feedback-box"></div>
+      </div>
+    </section>
+
+    <!-- MODE 2: T-ACCOUNT BALANCER -->
+    <section id="section-tAccount" class="mode-section">
+      <div class="game-card">
+        <div class="game-card-header">
+          <div>
+            <h2 class="game-card-title"><span>⚖️</span> T-Account Balancing & Year-End Fate</h2>
+            <p class="game-card-subtitle">Master the crucial ACCA distinction between "Balance c/d" (SOFP) and closing off "to SPL" (Nominal accounts).</p>
+          </div>
+          <div style="display:flex; gap:0.5rem; align-items:center;">
+            <span id="ta-account-badge" class="hud-pill" style="color:#38bdf8;">Asset (SOFP)</span>
+            <span id="ta-counter" class="hud-pill">Account 1 of 4</span>
+          </div>
+        </div>
+
+        <!-- T-Account Visual Board -->
+        <div class="t-account-wrapper">
+          <div id="ta-account-name" class="t-account-title">Bank Account</div>
+          <div class="t-account-columns">
+            <!-- Debit Side -->
+            <div class="t-account-col">
+              <div class="t-side-header">DEBIT SIDE (DR)</div>
+              <div id="ta-debits-list" style="display:flex; flex-direction:column; gap:0.25rem;"></div>
+            </div>
+            <!-- Credit Side -->
+            <div class="t-account-col">
+              <div class="t-side-header">CREDIT SIDE (CR)</div>
+              <div id="ta-credits-list" style="display:flex; flex-direction:column; gap:0.25rem;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Balancing Challenge Inputs -->
+        <div style="background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.25rem; margin-bottom:1.5rem;">
+          <h3 style="font-size:1rem; font-weight:700; margin-bottom:1rem; color:#93c5fd;">Balancing Off Workings:</h3>
+          
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1rem;">
+            <div>
+              <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:0.3rem;">1. Total of Larger Side (£):</label>
+              <input type="number" id="ta-input-total" class="hud-pill" style="width:100%; font-family:var(--font-mono); font-size:1rem;" placeholder="e.g. 44100">
+            </div>
+
+            <div>
+              <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:0.3rem;">2. Balancing Figure (£):</label>
+              <input type="number" id="ta-input-balance" class="hud-pill" style="width:100%; font-family:var(--font-mono); font-size:1rem;" placeholder="e.g. 12900">
+            </div>
+
+            <div>
+              <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:0.3rem;">3. Nature of Account Balance:</label>
+              <select id="ta-select-type" class="hud-pill" style="width:100%; font-size:0.9rem;">
+                <option value="debit">True DEBIT Balance (Debits > Credits)</option>
+                <option value="credit">True CREDIT Balance (Credits > Debits)</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:0.3rem;">4. Year-End Closing Treatment:</label>
+              <select id="ta-select-dest" class="hud-pill" style="width:100%; font-size:0.9rem;">
+                <option value="sofp">Carried forward as Balance b/d to SOFP (Asset/Liab/Cap)</option>
+                <option value="spl">Closed to Statement of Profit or Loss (Nominal - to SPL)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <button id="ta-btn-check" class="hud-btn primary" onclick="window.gameEngine.submitTAccount()" style="padding:0.75rem 1.5rem; font-size:1rem;">
+            Verify Ledger & Balance Off
+          </button>
+          <button id="ta-btn-next" class="hud-btn" onclick="window.gameEngine.nextTAccount()" style="display:none; padding:0.75rem 1.5rem; font-size:1rem; background:#10b981; color:white; border-color:#059669;">
+            Next Ledger Account ➔
+          </button>
+        </div>
+
+        <div id="ta-feedback" class="feedback-box"></div>
+      </div>
+    </section>
+
+    <!-- MODE 3: SUSPENSE DETECTIVE -->
+    <section id="section-detective" class="mode-section">
+      <div class="game-card">
+        <div class="game-card-header">
+          <div>
+            <h2 class="game-card-title"><span>🕵️</span> The Trial Balance & Suspense Detective</h2>
+            <p class="game-card-subtitle">Investigate accounting anomalies, determine trial balance impact, and formulate the correcting General Journal entries.</p>
+          </div>
+          <span id="det-counter" class="hud-pill">Mystery 1 of 6</span>
+        </div>
+
+        <div class="scenario-box">
+          <span id="det-title" class="scenario-tag">Accounting Error Reported</span>
+          <p id="det-scenario-text" class="scenario-text">Loading case file...</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.25rem; margin-bottom:1.5rem;">
+          <div style="background:var(--bg-input); padding:1.25rem; border-radius:var(--radius-md); border:1px solid var(--border);">
+            <label style="font-size:0.85rem; font-weight:700; color:#38bdf8; display:block; margin-bottom:0.5rem;">
+              Question 1: Does this error cause the Trial Balance to be out of balance?
+            </label>
+            <select id="det-select-affects" class="hud-pill" style="width:100%; font-size:0.9rem;">
+              <option value="no">NO — The Trial Balance totals will still balance</option>
+              <option value="yes">YES — The Trial Balance will NOT balance (Requires Suspense Account)</option>
+            </select>
+          </div>
+
+          <div style="background:var(--bg-input); padding:1.25rem; border-radius:var(--radius-md); border:1px solid var(--border);">
+            <label style="font-size:0.85rem; font-weight:700; color:#fbbf24; display:block; margin-bottom:0.5rem;">
+              Question 2: What is the official ACCA classification of this error?
+            </label>
+            <select id="det-select-error-type" class="hud-pill" style="width:100%; font-size:0.9rem;">
+              <option value="Error of Principle">Error of Principle (Capital vs Revenue violation)</option>
+              <option value="Error of Commission">Error of Commission (Wrong account, same correct class)</option>
+              <option value="Error of Omission">Error of Omission (Transaction completely left out)</option>
+              <option value="Compensating Error">Compensating Error (Two independent offsetting errors)</option>
+              <option value="Transposition / Single-Sided Error">Transposition / Single-Sided Error (Requires Suspense)</option>
+              <option value="Extraction / Posting Error">Extraction / Posting Error (Listed in wrong column/omitted from TB)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <button id="det-btn-solve" class="hud-btn primary" onclick="window.gameEngine.submitDetective()" style="padding:0.75rem 1.5rem; font-size:1rem;">
+            Submit Diagnostic & Journal
+          </button>
+          <button id="det-btn-next" class="hud-btn" onclick="window.gameEngine.nextDetective()" style="display:none; padding:0.75rem 1.5rem; font-size:1rem; background:#10b981; color:white; border-color:#059669;">
+            Next Mystery ➔
+          </button>
+        </div>
+
+        <div id="det-feedback" class="feedback-box"></div>
+      </div>
+    </section>
+
+    <!-- MODE 4: STATEMENT ARCHITECT -->
+    <section id="section-statements" class="mode-section">
+      <div class="game-card">
+        <div class="game-card-header">
+          <div>
+            <h2 class="game-card-title"><span>🏛️</span> Financial Statement Architect (SPL & SOFP)</h2>
+            <p class="game-card-subtitle" id="fs-company-header">Highland Trading Enterprise - For the Year Ended 31 December 20X6</p>
+          </div>
+          <button class="hud-btn" onclick="window.gameEngine.autoFillStatementDemo()" title="Test with verified values">
+            💡 Load Verified Solution
+          </button>
+        </div>
+
+        <div class="statement-builder-grid">
+          <!-- Left: Trial Balance Palette -->
+          <div class="tb-palette">
+            <h3 style="font-size:0.9rem; font-weight:800; color:#38bdf8; margin-bottom:0.5rem;">Extracted Trial Balance Extract:</h3>
+            <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.75rem;">
+              Warehouse Closing Inventory counted at 31 Dec 20X6: <strong>£21,000</strong>.
+            </p>
+            <div id="tb-palette-container"></div>
+          </div>
+
+          <!-- Right: Interactive Statement Paper -->
+          <div class="financial-statement-paper">
+            <h3 style="text-align:center; font-weight:800; font-size:1.15rem; color:#ffffff; margin-bottom:0.25rem;">
+              Statement of Profit or Loss (SPL)
+            </h3>
+            <p style="text-align:center; font-size:0.75rem; color:var(--text-muted); margin-bottom:1rem;">
+              IAS 1 / IFRS 18 Presentation Standard
+            </p>
+
+            <div class="fs-row">
+              <span>Revenue</span>
+              <span>£210,000</span>
+            </div>
+            <div class="fs-row">
+              <span>Less: Cost of Sales (Opening £18.5k + Purch £112k + Carr In £2.5k - Closing £21k)</span>
+              <span>
+                (£<input type="number" id="fs-input-cos" class="hud-pill" style="width:105px; text-align:right; font-family:var(--font-mono);" placeholder="COS...">)
+              </span>
+            </div>
+            <div class="fs-row total">
+              <span>GROSS PROFIT</span>
+              <span>
+                £<input type="number" id="fs-input-gp" class="hud-pill" style="width:105px; text-align:right; font-family:var(--font-mono);" placeholder="Gross...">
+              </span>
+            </div>
+
+            <div class="fs-row">
+              <span>Less: Distribution Costs (Carriage Outwards £3.4k + Advertising £6.8k)</span>
+              <span>(£10,200)</span>
+            </div>
+            <div class="fs-row">
+              <span>Less: Administrative Expenses (Salaries £24k + Rent/Rates/Ins £14.6k)</span>
+              <span>(£38,600)</span>
+            </div>
+            <div class="fs-row">
+              <span>Less: Finance Costs (Bank Loan Interest)</span>
+              <span>(£2,000)</span>
+            </div>
+            <div class="fs-row total">
+              <span>PROFIT FOR THE YEAR</span>
+              <span>
+                £<input type="number" id="fs-input-np" class="hud-pill" style="width:105px; text-align:right; font-family:var(--font-mono);" placeholder="Profit...">
+              </span>
+            </div>
+
+            <!-- Bridge to SOFP -->
+            <div class="fs-section-title">Statement of Financial Position (SOFP)</div>
+
+            <div class="fs-row">
+              <span>Non-Current Assets: PPE at Carrying Amount (£140,000 - £35,000)</span>
+              <span>£105,000</span>
+            </div>
+            <div class="fs-row">
+              <span>Current Assets: Closing Inventory (£21,000) + Net Receivables (£30,400) + Bank (£9,600)</span>
+              <span>£61,000</span>
+            </div>
+            <div class="fs-row total">
+              <span>TOTAL ASSETS</span>
+              <span>
+                £<input type="number" id="fs-input-ta" class="hud-pill" style="width:115px; text-align:right; font-family:var(--font-mono); color:#38bdf8;" placeholder="Total Assets...">
+              </span>
+            </div>
+
+            <div class="fs-section-title">Equity & Liabilities</div>
+
+            <div class="fs-row">
+              <span>Capital Bridge: Opening (£89k) + Profit for Year - Drawings (£15k)</span>
+              <span>
+                £<input type="number" id="fs-input-cap" class="hud-pill" style="width:110px; text-align:right; font-family:var(--font-mono);" placeholder="Closing Cap...">
+              </span>
+            </div>
+            <div class="fs-row">
+              <span>Non-Current Liabilities (10% Bank Loan)</span>
+              <span>£20,000</span>
+            </div>
+            <div class="fs-row">
+              <span>Current Liabilities (Trade Payables £21.5k + Accruals £1.5k)</span>
+              <span>£23,000</span>
+            </div>
+            <div class="fs-row total">
+              <span>TOTAL EQUITY AND LIABILITIES</span>
+              <span>
+                £<input type="number" id="fs-input-tel" class="hud-pill" style="width:115px; text-align:right; font-family:var(--font-mono); color:#fbbf24;" placeholder="Total Eq & Liab...">
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div id="fs-feedback" class="feedback-box" style="margin-top:1.5rem;"></div>
+      </div>
+    </section>
+
+    <!-- MODE 5: INVENTORY & ASSETS -->
+    <section id="section-inventory" class="mode-section">
+      <div class="game-card">
+        <div class="game-card-header">
+          <div>
+            <h2 class="game-card-title"><span>📦</span> IAS 2 Inventory Valuation & IAS 16 Asset Tycoon</h2>
+            <p class="game-card-subtitle">Evaluate inventory at the Lower of Cost and Net Realisable Value (NRV) line by line.</p>
+          </div>
+          <span class="hud-pill" style="color:#fbbf24;">IAS 2 Standard Drill</span>
+        </div>
+
+        <div class="scenario-box">
+          <span class="scenario-tag">Accounting Standard Requirement: IAS 2</span>
+          <p class="scenario-text">
+            Calculate the Net Realisable Value (NRV = Expected Selling Price − Estimated Completion Costs − Selling Expenses), and identify the lower figure to recognize for each product line.
+          </p>
+        </div>
+
+        <div style="overflow-x:auto; margin-bottom:1.5rem;">
+          <table style="width:100%; border-collapse:collapse; font-size:0.875rem;">
+            <thead>
+              <tr style="border-bottom:2px solid var(--border); color:var(--text-muted); text-align:left;">
+                <th style="padding:0.6rem 0.5rem;">Product Line</th>
+                <th style="padding:0.6rem 0.5rem; text-align:right;">Historical Cost</th>
+                <th style="padding:0.6rem 0.5rem; text-align:right;">Expected Selling Price</th>
+                <th style="padding:0.6rem 0.5rem; text-align:right; color:#fbbf24;">Calculated NRV</th>
+                <th style="padding:0.6rem 0.5rem; text-align:right; color:#38bdf8;">IAS 2 Lower Amount (£)</th>
+              </tr>
+            </thead>
+            <tbody id="inv-table-body"></tbody>
+          </table>
+        </div>
+
+        <button class="hud-btn primary" onclick="window.gameEngine.submitInventory()" style="padding:0.75rem 1.5rem; font-size:1rem;">
+          Verify IAS 2 Valuation
+        </button>
+
+        <div id="inv-feedback" class="feedback-box"></div>
+      </div>
+    </section>
+
+    <!-- MODE 6: EXAM TRAP BLITZ -->
+    <section id="section-blitz" class="mode-section">
+      <div class="game-card">
+        <div class="game-card-header">
+          <div>
+            <h2 class="game-card-title"><span>🛡️</span> ACCA FFA Exam Trap Blitz</h2>
+            <p class="game-card-subtitle">High-stakes objective scenario questions based directly on the official ACCA syllabus traps and lecture notes.</p>
+          </div>
+          <span id="blitz-counter" class="hud-pill">Question 1 of 8</span>
+        </div>
+
+        <div class="scenario-box">
+          <span id="blitz-tag" class="scenario-tag">ACCA Syllabus Area</span>
+          <p id="blitz-question-text" class="scenario-text">Loading question...</p>
+        </div>
+
+        <div id="blitz-options" class="choice-grid" style="margin-bottom:1.5rem;"></div>
+
+        <div style="display:flex; justify-content:flex-end;">
+          <button id="blitz-btn-next" class="hud-btn" onclick="window.gameEngine.nextBlitz()" style="display:none; padding:0.75rem 1.5rem; font-size:1rem; background:#10b981; color:white; border-color:#059669;">
+            Next Exam Question ➔
+          </button>
+        </div>
+
+        <div id="blitz-feedback" class="feedback-box"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: PROFILE & DATA STORAGE (per modern-web-guidance: native dialog with closedby="any") -->
+  <dialog id="dlg-profile" class="app-modal" closedby="any" aria-labelledby="profile-title">
+    <div class="modal-header">
+      <h3 id="profile-title">Candidate Profile & Data Storage Hub</h3>
+      <button class="btn-close-modal" onclick="document.getElementById('dlg-profile').close()" aria-label="Close modal">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Edit Profile Name -->
+      <div style="margin-bottom:1.25rem;">
+        <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:0.3rem;">Candidate Name / Identity:</label>
+        <div style="display:flex; gap:0.5rem;">
+          <input type="text" id="prof-input-name" class="hud-pill" style="flex:1; font-size:1rem;" placeholder="Your Name">
+          <button class="hud-btn primary" onclick="window.gameEngine.saveProfileName()">Update</button>
+        </div>
+      </div>
+
+      <!-- Stats Summary -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:0.75rem; margin-bottom:1.5rem;">
+        <div class="hud-pill" style="flex-direction:column; align-items:flex-start;">
+          <span style="font-size:0.7rem; color:var(--text-muted);">Current Rank</span>
+          <span id="prof-rank-title" style="font-size:0.85rem; font-weight:800; color:#38bdf8;">Trainee Bookkeeper</span>
+        </div>
+        <div class="hud-pill" style="flex-direction:column; align-items:flex-start;">
+          <span style="font-size:0.7rem; color:var(--text-muted);">Total XP / Level</span>
+          <span id="prof-xp-display" style="font-size:0.85rem; font-weight:800; color:#a855f7;">0 XP (Level 1)</span>
+        </div>
+        <div class="hud-pill" style="flex-direction:column; align-items:flex-start;">
+          <span style="font-size:0.7rem; color:var(--text-muted);">Total Marks</span>
+          <span id="prof-coins-display" style="font-size:0.85rem; font-weight:800; color:#fbbf24;">50 Marks</span>
+        </div>
+        <div class="hud-pill" style="flex-direction:column; align-items:flex-start;">
+          <span style="font-size:0.7rem; color:var(--text-muted);">Overall Accuracy</span>
+          <span id="prof-accuracy-display" style="font-size:0.85rem; font-weight:800; color:#34d399;">0%</span>
+        </div>
+      </div>
+
+      <!-- Badges Unlocked -->
+      <h4 style="font-size:0.95rem; font-weight:800; margin-bottom:0.75rem; color:#f8fafc;">Earned ACCA Badges & Honors</h4>
+      <div id="prof-badges-grid" class="badges-grid" style="margin-bottom:1.5rem;"></div>
+
+      <!-- Data Storage & Cloud Management Section -->
+      <div style="background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius-md); padding:1rem;">
+        <h4 style="font-size:0.9rem; font-weight:800; color:#38bdf8; margin-bottom:0.4rem;">Data Storage & Persistence Operations</h4>
+        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.75rem;">
+          Your progress is persistently stored in browser LocalStorage. You can export a JSON backup, restore save files, or clear data.
+        </p>
+
+        <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+          <button class="hud-btn" onclick="window.gameEngine.exportData()">
+            💾 Export JSON Backup
+          </button>
+
+          <label class="hud-btn" style="cursor:pointer;">
+            📥 Import JSON Backup
+            <input type="file" accept=".json" onchange="window.gameEngine.importData(event)" style="display:none;">
+          </label>
+
+          <button class="hud-btn" onclick="window.gameEngine.confirmReset()" style="color:#ef4444; border-color:rgba(239, 68, 68, 0.3);">
+            🗑️ Reset All Data
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="hud-btn" onclick="document.getElementById('dlg-profile').close()">Close</button>
+    </div>
+  </dialog>
+
+  <!-- MODAL: AUDIT TRAIL LOGS -->
+  <dialog id="dlg-history" class="app-modal" closedby="any" aria-labelledby="history-title">
+    <div class="modal-header">
+      <h3 id="history-title">ACCA Examination Audit Trail & Logs</h3>
+      <button class="btn-close-modal" onclick="document.getElementById('dlg-history').close()" aria-label="Close modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">
+        Every recorded session is chronologically logged with accuracy, score, and syllabus XP awarded.
+      </p>
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.825rem;">
+          <thead>
+            <tr style="border-bottom:2px solid var(--border); color:var(--text-muted); text-align:left;">
+              <th style="padding:0.5rem;">Time</th>
+              <th style="padding:0.5rem;">Mode</th>
+              <th style="padding:0.5rem;">Score</th>
+              <th style="padding:0.5rem;">Accuracy</th>
+              <th style="padding:0.5rem;">XP Earned</th>
+            </tr>
+          </thead>
+          <tbody id="history-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="hud-btn" onclick="document.getElementById('dlg-history').close()">Close</button>
+    </div>
+  </dialog>
+
+  <!-- MODAL: ACCA QUICK REFERENCE SHEET -->
+  <dialog id="dlg-reference" class="app-modal" closedby="any" aria-labelledby="ref-title" style="max-width:800px;">
+    <div class="modal-header">
+      <h3 id="ref-title">ACCA Financial Accounting (FFA / FA) Quick Reference</h3>
+      <button class="btn-close-modal" onclick="document.getElementById('dlg-reference').close()" aria-label="Close modal">&times;</button>
+    </div>
+    <div class="modal-body" style="font-size:0.85rem; line-height:1.6;">
+      <h4 style="color:#38bdf8; font-weight:800; margin-bottom:0.4rem;">1. DEAD CLIC Rules</h4>
+      <p><strong>Debit increases:</strong> Expenses, Assets, Drawings (Decreases are Credited).<br>
+      <strong>Credit increases:</strong> Liabilities, Income, Capital (Decreases are Debited).</p>
+
+      <h4 style="color:#fbbf24; font-weight:800; margin-top:1rem; margin-bottom:0.4rem;">2. The Extended Accounting Equations</h4>
+      <p>• <strong>Fundamental Equation:</strong> Assets = Capital + Liabilities<br>
+      • <strong>Net Assets Equation:</strong> Net Assets (Assets − Liabilities) = Capital<br>
+      • <strong>Dynamic Business Equation:</strong> Closing Net Assets = Opening Net Assets + Capital Introduced + Profit for the Year − Drawings</p>
+
+      <h4 style="color:#34d399; font-weight:800; margin-top:1rem; margin-bottom:0.4rem;">3. Trial Balance Errors</h4>
+      <p>• <strong>Errors not affecting Trial Balance (TB still balances):</strong> Omission, Commission, Principle, Compensating, Original Entry, Complete Reversal.<br>
+      • <strong>Errors affecting Trial Balance (Requires Suspense Account):</strong> Single entry, Casting error, Extraction error, Transposition on one side.</p>
+
+      <h4 style="color:#a855f7; font-weight:800; margin-top:1rem; margin-bottom:0.4rem;">4. IAS 2 Inventory Valuation</h4>
+      <p>Inventory must be valued at the <strong>lower of cost and net realisable value (NRV)</strong> on an item-by-item basis. NRV = Expected Selling Price − Completion Costs − Selling Expenses.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="hud-btn" onclick="document.getElementById('dlg-reference').close()">Close</button>
+    </div>
+  </dialog>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FIFO vs LIFO Master: Perpetual & Periodic Inventory Simulator</title>
+  <link rel="stylesheet" href="css/fifo-lifo.css">
+  <meta name="description" content="Financial accounting interactive simulator and game mastering FIFO and LIFO under Perpetual and Periodic inventory systems with persistent data storage.">
+</head>
+<body>
+
+  <!-- APP HEADER & HUD -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="brand-logo" aria-hidden="true">📦</div>
+        <div class="brand-text">
+          <h1>
+            FIFO vs LIFO Master
+            <span class="badge-tag">Perpetual & Periodic</span>
+            <span id="storage-status-badge" class="badge-tag server-status">
+              <span style="font-size:0.7rem;">●</span> Connecting...
+            </span>
+          </h1>
+        </div>
+      </div>
+
+      <!-- Live Player Stats HUD -->
+      <div class="hud-bar">
+        <a href="index.html" class="hud-btn accent-switch" title="Return to ACCA Financial Accounting Master">
+          🏛️ ACCA FA Game
+        </a>
+
+        <div class="hud-pill xp-pill" title="Candidate Rank & Progression">
+          <span style="font-size:1.1rem;">🎖️</span>
+          <div style="flex:1;">
+            <div style="display:flex; justify-content:space-between; gap:0.5rem; font-size:0.75rem;">
+              <span id="hud-level">Lvl 1</span>
+              <span id="hud-xp" style="color:#38bdf8;">0 XP</span>
+            </div>
+            <div id="hud-player-title" style="font-size:0.65rem; color:var(--text-muted); font-weight:normal;">Junior Stock Clerk</div>
+          </div>
+          <div class="xp-progress-bar" id="hud-xp-bar"></div>
+        </div>
+
+        <div class="hud-pill" title="Earned Corporate Capital / Marks">
+          <span>🪙</span>
+          <span class="hud-value" id="hud-coins">50</span>
+          <span style="font-size:0.7rem; color:var(--text-muted);">Marks</span>
+        </div>
+
+        <div class="hud-pill" title="Current Combo Multiplier Streak">
+          <span>🔥</span>
+          <span class="hud-value" id="hud-streak">0x</span>
+        </div>
+
+        <button id="btn-sound-toggle" class="hud-btn" title="Toggle Sound Effects">
+          🔊 Sound: ON
+        </button>
+
+        <button id="btn-reference" class="hud-btn" title="Open Valuation Guide & Cheat Sheet">
+          📖 Guide
+        </button>
+
+        <button id="btn-history" class="hud-btn" title="View Audit Trail History">
+          📋 Logs
+        </button>
+
+        <button id="btn-profile" class="hud-btn primary" title="View Badges & Save Data">
+          👤 <span id="hud-player-name">Candidate</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- NAVIGATION TABS -->
+  <nav class="game-nav" aria-label="Game Modes">
+    <button class="nav-tab-btn active" data-tab="simulator">
+      <span>🏢</span> 1. 4-Way Simulator & Matrix
+    </button>
+    <button class="nav-tab-btn" data-tab="dispatcher">
+      <span>📦</span> 2. Warehouse Dispatcher
+    </button>
+    <button class="nav-tab-btn" data-tab="ledger">
+      <span>📊</span> 3. Stock Card & Exam Arena
+    </button>
+    <button class="nav-tab-btn" data-tab="cfo">
+      <span>🕵️</span> 4. CFO Strategy & Impact Detective
+    </button>
+    <button class="nav-tab-btn" data-tab="sandbox">
+      <span>🛠️</span> 5. Custom Sandbox & Tycoon
+    </button>
+  </nav>
+
+  <!-- MAIN GAME CONTAINER -->
+  <main class="game-container">
+
+    <!-- ============================================================ -->
+    <!-- MODE 1: 4-WAY COMPARISON & INTERACTIVE SIMULATOR -->
+    <!-- ============================================================ -->
+    <section id="section-simulator" class="mode-section active">
+      <div class="game-card">
+        <div class="game-card-header">
+          <div>
+            <h2 class="game-card-title"><span>🏢</span> 4-Way Inventory Engine & Simulator</h2>
+            <p class="game-card-subtitle">
+              Step through identical business transactions to visualize how <strong>FIFO Periodic</strong>, <strong>FIFO Perpetual</strong>, <strong>LIFO Periodic</strong>, and <strong>LIFO Perpetual</strong> allocate inventory costs.
+            </p>
+          </div>
+
+          <div style="display:flex; gap:0.5rem; align-items:center;">
+            <label for="sim-scenario-select" style="font-size:0.82rem; color:var(--text-muted); font-weight:600;">Scenario:</label>
+            <select id="sim-scenario-select" class="form-select" style="width:auto; padding:0.4rem 0.8rem; font-size:0.85rem;">
+              <!-- Populated via JS -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Scenario Meta Banner -->
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:var(--radius-md); padding:1rem; margin-bottom:1.25rem;">
+          <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.4rem;">
+            <h3 id="sim-scenario-title" style="font-size:1.05rem; font-weight:700; color:#fff;">Loading...</h3>
+            <span id="sim-scenario-trend" class="badge-tag">INFLATION</span>
+          </div>
+          <p id="sim-scenario-desc" style="font-size:0.85rem; color:var(--text-muted);"></p>
+        </div>
+
+        <!-- Interactive Stepper Timeline Controls -->
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#0a0f1d; border:1px solid var(--border); border-radius:var(--radius-md); padding:0.75rem 1rem; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.75rem;">
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <button id="sim-step-prev" class="btn" style="padding:0.4rem 0.8rem;" title="Previous Transaction">◀ Prev</button>
+            <span id="sim-step-counter" style="font-size:0.85rem; font-weight:700; font-family:var(--font-mono); min-width:110px; text-align:center;">Step 1 of 6</span>
+            <button id="sim-step-next" class="btn" style="padding:0.4rem 0.8rem;" title="Next Transaction">Next ▶</button>
+            <button id="sim-step-auto" class="btn" style="padding:0.4rem 0.8rem;" title="Auto-Play Stepper">▶ Auto</button>
+          </div>
+
+          <div style="display:flex; gap:0.5rem; align-items:center;">
+            <span style="font-size:0.75rem; color:var(--text-muted);">Method Focus:</span>
+            <button class="hud-btn active sim-method-filter" data-method="ALL">⚡ All 4 Methods</button>
+            <button class="hud-btn sim-method-filter" data-method="FIFO_PERPETUAL">🔵 FIFO Perp</button>
+            <button class="hud-btn sim-method-filter" data-method="LIFO_PERPETUAL">🔴 LIFO Perp</button>
+          </div>
+        </div>
+
+        <!-- Active Step Transaction Callout -->
+        <div id="sim-active-transaction-box" style="background:#131c2e; border-left:4px solid #38bdf8; border-radius:var(--radius-sm); padding:0.85rem 1rem; margin-bottom:1.25rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span id="sim-tx-date" style="font-weight:700; color:#38bdf8; font-size:0.85rem;">2026-03-01</span>
+            <span id="sim-tx-badge" class="badge-tag">PURCHASE</span>
+          </div>
+          <div id="sim-tx-text" style="font-size:1rem; font-weight:600; color:#fff; margin-top:0.3rem;">
+            Acquired 100 units @ $10.00 each. Total Cost: $1,000.00
+          </div>
+        </div>
+
+        <!-- Visual Warehouse Rack (Live Pallets) -->
+        <div class="warehouse-rack-container">
+          <div class="warehouse-rack-title">
+            <span>🏭 Live Warehouse Shelf Stock (At Current Step)</span>
+            <span id="sim-shelf-summary" style="font-family:var(--font-mono); color:#fff;">100 Units | $1,000.00</span>
+          </div>
+          <div id="sim-pallets-container" class="pallets-flex">
+            <!-- Pallets injected dynamically -->
+          </div>
+        </div>
+
+        <!-- 4-Way Comparative Scorecard -->
+        <div class="comparison-grid-4" id="sim-comparison-cards">
+          <!-- 1. FIFO Periodic -->
+          <div class="method-column-card highlight-fifo">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="badge-tag badge-fifo-periodic">FIFO Periodic</span>
+              <span style="font-size:0.75rem; color:var(--text-muted);">Period-End</span>
+            </div>
+            <div>
+              <div class="stat-row">
+                <span class="stat-label">Ending Inventory Units:</span>
+                <span class="stat-val" id="val-fifo-per-ending-units">--</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Ending Inventory ($):</span>
+                <span class="stat-val ending-inv" id="val-fifo-per-ending-cost">--</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Cost of Goods Sold (COGS):</span>
+                <span class="stat-val cogs" id="val-fifo-per-cogs">--</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Gross Profit:</span>
+                <span class="stat-val profit" id="val-fifo-per-profit">--</span>
+              </div>
+            </div>
+            <div style="font-size:0.75rem; color:#38bdf8; background:rgba(56,189,248,0.08); padding:0.5rem; border-radius:var(--radius-sm);">
+              ✓ Ending inventory drawn from LATEST acquisitions backwards.
+            </div>
+          </div>
+
+          <!-- 2. FIFO Perpetual -->
+          <div class="method-column-card highlight-fifo">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="badge-tag badge-fifo-perpetual">FIFO Perpetual</span>
+              <span style="font-size:0.75rem; color:#10b981; font-weight:700;">Identical to Periodic!</span>
+            </div>
+            <div>
+              <div class="stat-row">
+                <span class="stat-label">Ending Inventory Units:</span>
+                <span class="stat-val" id="val-fifo-perp-ending-units">--</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Ending Inventory ($):</span>
+                <span class="stat-val ending-inv" id="val-fifo-perp-ending-cost">--</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Cost of Goods Sold (COGS):</span>
+                <span class="stat-val cogs" id="val-fifo-perp-cogs">--</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Gross Profit:</span>
+                <span class="stat-val profit" id="val-fifo-perp-profit">--</span>
+              </div>
+            </div>
+            <div style="font-size:0.75rem; color:#34d399; background:rgba(16,185,129,0.08); padding:0.5rem; border-radius:var(--radius-sm);">
+              ✓ Continuous stock queue depleting earliest batches on hand.
+            </div>
+          </div>
+
+          <!-- 3. LIFO Periodic -->
+          <div class="method-column-card highlight-lifo">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="badge-tag badge-lifo-periodic">LIFO Periodic</span>
+              <span style="font-size:0.75rem; color:var(--text-muted);">Period-End</span>
+            </div>
+            <div>
+              <div class="stat-row">
+                <span class="stat-label">Ending Inventory Units:</span>
+                <span class="stat-val" id="val-lifo-per-ending-units">--</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Ending Inventory ($):</span>
+                <span class="stat-val ending-inv" id="val-lifo-per-ending-cost">--</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Cost of Goods Sold (COGS):</span>
+                <span class="stat-val cogs" id="val-lifo-per-cogs">--</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Gross Profit:</span>
+                <span class="stat-val profit" id="val-lifo-per-profit">--</span>
+              </div>
+            </div>
+            <div style="font-size:0.75rem; color:#fbbf24; background:rgba(245,158,11,0.08); padding:0.5rem; border-radius:var(--radius-sm);">
+              ✓ Ending inventory drawn from OLDEST base layers forward.
+            </div>
+          </div>
+
+          <!-- 4. LIFO Perpetual -->
+          <div class="method-column-card highlight-lifo">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="badge-tag badge-lifo-perpetual">LIFO Perpetual</span>
+              <span style="font-size:0.75rem; color:#fb7185; font-weight:700;">Point-in-Time Stack</span>
+            </div>
+            <div>
+              <div class="stat-row">
+                <span class="stat-label">Ending Inventory Units:</span>
+                <span class="stat-val" id="val-lifo-perp-ending-units">--</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Ending Inventory ($):</span>
+                <span class="stat-val ending-inv" id="val-lifo-perp-ending-cost">--</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Cost of Goods Sold (COGS):</span>
+                <span class="stat-val cogs" id="val-lifo-perp-cogs">--</span>
+              </div>
+              <div class="stat-row">
+                <span class="stat-label">Gross Profit:</span>
+                <span class="stat-val profit" id="val-lifo-perp-profit">--</span>
+              </div>
+            </div>
+            <div style="font-size:0.75rem; color:#fb7185; background:rgba(225,29,72,0.08); padding:0.5rem; border-radius:var(--radius-sm);">
+              ✓ Depletes latest available layer on shelf at exact moment of sale.
+            </div>
+          </div>
+        </div>
+
+        <!-- Key Accounting Takeaways & Reconciliation Accordion -->
+        <div style="margin-top:1.5rem; background:rgba(0,0,0,0.25); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.25rem;">
+          <h4 style="font-size:0.95rem; font-weight:700; color:#fff; margin-bottom:0.75rem; display:flex; align-items:center; gap:0.5rem;">
+            <span>💡</span> Key Reconciliation Takeaways for this Scenario
+          </h4>
+          <div id="sim-takeaways-list" style="display:flex; flex-direction:column; gap:0.5rem; font-size:0.85rem;">
+            <!-- Injected dynamically -->
+          </div>
+        </div>
+
+        <!-- Full Stock Card Ledger Accordion -->
+        <div style="margin-top:1.5rem;">
+          <button id="sim-btn-toggle-stockcard" class="btn" style="width:100%; justify-content:space-between;">
+            <span>📜 View Full Perpetual Stock Card Ledger (Audit Table)</span>
+            <span id="sim-stockcard-icon">▼</span>
+          </button>
+          <div id="sim-stockcard-container" style="display:none; margin-top:1rem;">
+            <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
+              <button class="btn btn-primary sim-ledger-tab active" data-ledger="FIFO_PERPETUAL">FIFO Perpetual Ledger</button>
+              <button class="btn sim-ledger-tab" data-ledger="LIFO_PERPETUAL">LIFO Perpetual Ledger</button>
+            </div>
+            <div class="table-responsive" id="sim-stockcard-table-wrapper">
+              <!-- Stock card table generated here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- MODE 2: WAREHOUSE DISPATCHER (PRACTICE ARENA) -->
+    <!-- ============================================================ -->
+    <section id="section-dispatcher" class="mode-section">
+      <div class="game-card">
+        <div class="game-card-header">
+          <div>
+            <h2 class="game-card-title"><span>📦</span> Warehouse Dispatcher Arena</h2>
+            <p class="game-card-subtitle">
+              Customer orders arrive at the loading dock. Fulfill each order by picking the exact layers mandated by the active accounting standard.
+            </p>
+          </div>
+          <span id="disp-mission-counter" class="hud-pill">Mission 1 of 5</span>
+        </div>
+
+        <!-- Mission Order Manifest -->
+        <div class="dispatch-mission-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
+            <h3 id="disp-mission-title" style="font-size:1.15rem; font-weight:800; color:#fff;">Mission Title</h3>
+            <span id="disp-mandate-badge" class="badge-tag badge-fifo-perpetual">FIFO Perpetual</span>
+          </div>
+
+          <div class="order-manifest">
+            <div class="order-pill">
+              <span class="order-pill-label">Client / Buyer</span>
+              <span class="order-pill-val" id="disp-client-name">Metro Electronics</span>
+            </div>
+            <div class="order-pill">
+              <span class="order-pill-label">Required Dispatch Units</span>
+              <span class="order-pill-val" id="disp-required-units" style="color:#38bdf8;">35 Units</span>
+            </div>
+            <div class="order-pill">
+              <span class="order-pill-label">Selling Price / Unit</span>
+              <span class="order-pill-val" id="disp-selling-price" style="color:#34d399;">$25.00</span>
+            </div>
+            <div class="order-pill">
+              <span class="order-pill-label">Gross Revenue</span>
+              <span class="order-pill-val" id="disp-gross-revenue">$875.00</span>
+            </div>
+          </div>
+
+          <!-- Warehouse Shelves for Picking -->
+          <div class="warehouse-rack-container" style="background:rgba(0,0,0,0.4);">
+            <div class="warehouse-rack-title">
+              <span>Select Batches to Load Truck (Follow the active mandate!)</span>
+              <span style="color:var(--text-muted); font-size:0.75rem;">Click a batch to allocate units</span>
+            </div>
+            <div id="disp-picker-pallets" class="pallets-flex">
+              <!-- Interactive picking pallets -->
+            </div>
+          </div>
+
+          <!-- Loading Dock Tally & COGS Calculation -->
+          <div style="background:#0a0f1d; border:1px solid var(--border); border-radius:var(--radius-md); padding:1rem; margin-top:1.25rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+              <div>
+                <div style="font-size:0.8rem; color:var(--text-muted);">Current Loading Tally:</div>
+                <div style="font-size:1.2rem; font-weight:800; font-family:var(--font-mono);">
+                  <span id="disp-loaded-units" style="color:#fbbf24;">0</span> / <span id="disp-target-units">35</span> Units Loaded
+                </div>
+              </div>
+
+              <div>
+                <div style="font-size:0.8rem; color:var(--text-muted);">Accumulated COGS:</div>
+                <div style="font-size:1.3rem; font-weight:800; font-family:var(--font-mono); color:#fb7185;">
+                  $<span id="disp-calc-cogs">0.00</span>
+                </div>
+              </div>
+
+              <div style="display:flex; gap:0.5rem;">
+                <button id="disp-btn-reset" class="btn">Clear</button>
+                <button id="disp-btn-submit" class="btn btn-primary">🚚 Dispatch & Verify</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mission Result Feedback Area -->
+          <div id="disp-feedback-box" style="display:none; margin-top:1.25rem; border-radius:var(--radius-md); padding:1.25rem;">
+            <div id="disp-feedback-header" style="font-size:1.1rem; font-weight:800; margin-bottom:0.5rem;"></div>
+            <div id="disp-feedback-text" style="font-size:0.9rem; line-height:1.5;"></div>
+            <div style="margin-top:1rem; display:flex; justify-content:flex-end;">
+              <button id="disp-btn-next" class="btn btn-success">Next Dispatch Order ▶</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- MODE 3: STOCK CARD & EXAM CALCULATION ARENA -->
+    <!-- ============================================================ -->
+    <section id="section-ledger" class="mode-section">
+      <div class="game-card">
+        <div class="game-card-header">
+          <div>
+            <h2 class="game-card-title"><span>📊</span> Inventory Ledger & Exam Arena</h2>
+            <p class="game-card-subtitle">
+              Rigorous scenario questions testing FIFO and LIFO calculations, periodic formulas, and stock ledger auditing.
+            </p>
+          </div>
+          <span id="exam-counter" class="hud-pill">Question 1 of 8</span>
+        </div>
+
+        <!-- Question Box -->
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.5rem; margin-bottom:1.5rem;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.75rem; flex-wrap:wrap; gap:0.5rem;">
+            <h3 id="exam-scenario-title" style="font-size:1.1rem; font-weight:800; color:#38bdf8;">Vanguard Trading Co.</h3>
+            <span id="exam-method-tag" class="badge-tag">FIFO Periodic</span>
+          </div>
+
+          <p id="exam-narrative" style="font-size:0.95rem; color:var(--text-main); margin-bottom:1rem; background:#0b1120; padding:1rem; border-radius:var(--radius-sm); border-left:3px solid #38bdf8; font-family:var(--font-mono);">
+            Loading narrative...
+          </p>
+
+          <h4 id="exam-question-text" style="font-size:1.05rem; font-weight:700; color:#fff; margin-bottom:1.25rem;">
+            Question prompt?
+          </h4>
+
+          <!-- Multiple Choice Options -->
+          <div id="exam-choices-grid" style="display:grid; grid-template-columns:1fr; gap:0.75rem;">
+            <!-- Options dynamically injected -->
+          </div>
+
+          <!-- Feedback & Step-by-Step Breakdown -->
+          <div id="exam-feedback-box" style="display:none; margin-top:1.25rem; border-radius:var(--radius-md); padding:1.25rem;">
+            <div id="exam-feedback-status" style="font-size:1.1rem; font-weight:800; margin-bottom:0.5rem;"></div>
+            <div id="exam-feedback-explanation" style="font-size:0.9rem; line-height:1.6; color:var(--text-muted);"></div>
+            <div style="margin-top:1rem; display:flex; justify-content:flex-end;">
+              <button id="exam-btn-next" class="btn btn-primary">Next Question ▶</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- MODE 4: CFO STRATEGY & FINANCIAL IMPACT DETECTIVE -->
+    <!-- ============================================================ -->
+    <section id="section-cfo" class="mode-section">
+      <div class="game-card">
+        <div class="game-card-header">
+          <div>
+            <h2 class="game-card-title"><span>🕵️</span> CFO Strategy & Impact Detective</h2>
+            <p class="game-card-subtitle">
+              Inspect how inventory choices flow directly into the <strong>Statement of Profit or Loss</strong> and <strong>Statement of Financial Position</strong>, govern tax liabilities, and trigger regulatory compliance.
+            </p>
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn btn-primary cfo-dataset-toggle active" data-dataset="apex_inflation">Inflation Case</button>
+            <button class="btn cfo-dataset-toggle" data-dataset="nordic_timber">Deflation Case</button>
+          </div>
+        </div>
+
+        <!-- Comparative Financial Statements Table -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:1.25rem; margin-bottom:1.5rem;">
+          
+          <!-- Income Statement Side-by-Side -->
+          <div class="statement-card">
+            <div class="statement-title">
+              <span>Statement of Profit or Loss (SPL)</span>
+              <span style="font-size:0.75rem; color:var(--text-muted);">Tax @ 25%</span>
+            </div>
+            <div style="overflow-x:auto;">
+              <table style="width:100%; font-size:0.85rem; border-collapse:collapse;">
+                <thead>
+                  <tr style="color:var(--text-muted); border-bottom:1px solid var(--border);">
+                    <th style="text-align:left; padding:0.4rem 0;">Metric</th>
+                    <th style="text-align:right; color:#38bdf8;">FIFO</th>
+                    <th style="text-align:right; color:#fb7185;">LIFO</th>
+                    <th style="text-align:right; color:#34d399;">LIFO Effect</th>
+                  </tr>
+                </thead>
+                <tbody id="cfo-spl-tbody">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Balance Sheet & Tax Shield -->
+          <div class="statement-card">
+            <div class="statement-title">
+              <span>Statement of Financial Position (SOFP)</span>
+              <span style="font-size:0.75rem; color:var(--text-muted);">Balance Sheet</span>
+            </div>
+            <div style="overflow-x:auto;">
+              <table style="width:100%; font-size:0.85rem; border-collapse:collapse;">
+                <thead>
+                  <tr style="color:var(--text-muted); border-bottom:1px solid var(--border);">
+                    <th style="text-align:left; padding:0.4rem 0;">Asset / Equity</th>
+                    <th style="text-align:right; color:#38bdf8;">FIFO</th>
+                    <th style="text-align:right; color:#fb7185;">LIFO</th>
+                    <th style="text-align:right; color:#fbbf24;">Variance</th>
+                  </tr>
+                </thead>
+                <tbody id="cfo-sofp-tbody">
+                  <!-- Injected via JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- LIFO Reserve & Tax Shield Box -->
+            <div style="margin-top:1rem; background:rgba(0,0,0,0.3); border-radius:var(--radius-sm); padding:0.75rem; border-left:3px solid #fbbf24;">
+              <div style="font-size:0.8rem; color:var(--text-muted);">LIFO Reserve Footnote:</div>
+              <div style="font-size:1.1rem; font-weight:800; font-family:var(--font-mono); color:#fbbf24;" id="cfo-lifo-reserve-val">
+                $0.00
+              </div>
+              <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;" id="cfo-tax-shield-desc">
+                Estimated corporate cash tax shielded: $0.00
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Strategic CFO Question Prompts -->
+        <div style="background:#0c1322; border:1px solid var(--border); border-radius:var(--radius-md); padding:1.25rem;">
+          <h3 style="font-size:1.05rem; font-weight:700; color:#fff; margin-bottom:0.75rem; display:flex; align-items:center; gap:0.5rem;">
+            <span>💼</span> Executive Boardroom Decision Challenge
+          </h3>
+          <p id="cfo-challenge-prompt" style="font-size:0.9rem; color:var(--text-main); margin-bottom:1rem;">
+            The company's Board is considering whether to adopt LIFO under US GAAP for tax savings. What is the impact on reported net income?
+          </p>
+          <div id="cfo-challenge-options" style="display:grid; grid-template-columns:1fr; gap:0.5rem;">
+            <!-- CFO options -->
+          </div>
+          <div id="cfo-challenge-feedback" style="display:none; margin-top:1rem; padding:1rem; border-radius:var(--radius-sm);"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- MODE 5: CUSTOM SANDBOX & CASE STUDY CREATOR (TYCOON) -->
+    <!-- ============================================================ -->
+    <section id="section-sandbox" class="mode-section">
+      <div class="game-card">
+        <div class="game-card-header">
+          <div>
+            <h2 class="game-card-title"><span>🛠️</span> Custom Sandbox & Inventory Tycoon</h2>
+            <p class="game-card-subtitle">
+              Configure your own company's purchases and sales. Run our 4-way valuation engine on your custom numbers and save company simulations into the persistent store!
+            </p>
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <button id="sb-btn-sample" class="btn">Load Sample Data</button>
+            <button id="sb-btn-save-company" class="btn btn-success">💾 Save to Database</button>
+          </div>
+        </div>
+
+        <!-- Add Transaction Form -->
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.25rem; margin-bottom:1.5rem;">
+          <h3 style="font-size:0.95rem; font-weight:700; color:#fff; margin-bottom:1rem;">+ Add New Inventory Transaction</h3>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:0.75rem; align-items:flex-end;">
+            <div class="form-group" style="margin:0;">
+              <label class="form-label">Date</label>
+              <input type="date" id="sb-input-date" class="form-input" value="2026-04-01">
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label class="form-label">Type</label>
+              <select id="sb-input-type" class="form-select">
+                <option value="PURCHASE">Purchase (Receipt)</option>
+                <option value="SALE">Sale (Issue)</option>
+                <option value="BEGINNING">Beginning Inventory</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin:0;">
+              <label class="form-label">Units</label>
+              <input type="number" id="sb-input-units" class="form-input" placeholder="e.g. 50" min="1" value="25">
+            </div>
+            <div class="form-group" style="margin:0;" id="sb-group-cost">
+              <label class="form-label">Unit Cost ($)</label>
+              <input type="number" id="sb-input-cost" class="form-input" placeholder="e.g. 15.00" step="0.01" min="0" value="14.00">
+            </div>
+            <div class="form-group" style="margin:0; display:none;" id="sb-group-price">
+              <label class="form-label">Selling Price ($)</label>
+              <input type="number" id="sb-input-price" class="form-input" placeholder="e.g. 25.00" step="0.01" min="0" value="25.00">
+            </div>
+            <div>
+              <button id="sb-btn-add-tx" class="btn btn-primary" style="width:100%;">Add Leg</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom Transactions Table -->
+        <div style="margin-bottom:1.5rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+            <h3 style="font-size:0.95rem; font-weight:700; color:#fff;">Active Custom Schedule</h3>
+            <button id="sb-btn-clear-tx" class="btn" style="padding:0.3rem 0.6rem; font-size:0.75rem;">Clear All</button>
+          </div>
+          <div class="table-responsive">
+            <table class="stock-ledger-table" id="sb-transactions-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Date</th>
+                  <th>Transaction Type</th>
+                  <th>Units</th>
+                  <th>Unit Cost / Price</th>
+                  <th>Total Amount</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="sb-tx-tbody">
+                <!-- Transaction rows -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Run 4-Way Analysis Button -->
+        <div style="display:flex; justify-content:center; margin-bottom:1.5rem;">
+          <button id="sb-btn-calculate" class="btn btn-primary" style="font-size:1rem; padding:0.75rem 2rem;">
+            ⚡ Run 4-Way Valuation Matrix
+          </button>
+        </div>
+
+        <!-- Results Display Grid -->
+        <div id="sb-results-panel" style="display:none;">
+          <h3 style="font-size:1.1rem; font-weight:800; color:#fff; margin-bottom:1rem;">
+            📊 Comparative Results on Your Custom Schedule
+          </h3>
+          <div class="comparison-grid-4" id="sb-comparison-grid">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+        <!-- Saved Companies Slot Manager -->
+        <div style="margin-top:2rem; border-top:1px solid var(--border); padding-top:1.5rem;">
+          <h3 style="font-size:1rem; font-weight:700; color:#fff; margin-bottom:1rem;">
+            💾 Stored Companies & Scenarios (From Data Persistence Engine)
+          </h3>
+          <div id="sb-saved-companies-list" style="display:flex; flex-direction:column; gap:0.75rem;">
+            <!-- Populated from storage -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================ -->
+  <!-- MODAL: VALUATION GUIDE & CHEAT SHEET -->
+  <!-- ============================================================ -->
+  <div id="modal-reference" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">📖 Comprehensive FIFO vs LIFO Reference Guide</h3>
+        <button class="modal-close" id="modal-close-ref">&times;</button>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:1.25rem; font-size:0.9rem; line-height:1.6;">
+        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem;">
+          <h4 style="font-weight:700; color:#38bdf8; margin-bottom:0.4rem;">1. Core Inventory Accounting Equation</h4>
+          <p style="font-family:var(--font-mono); color:#fff; font-size:0.85rem;">
+            Beginning Inventory + Purchases = Cost of Goods Available for Sale (COGAS)<br>
+            COGAS − Ending Inventory = Cost of Goods Sold (COGS)<br>
+            Sales Revenue − COGS = Gross Profit
+          </p>
+        </div>
+
+        <div>
+          <h4 style="font-weight:700; color:#fff; margin-bottom:0.5rem;">2. The 4 Combinations at a Glance</h4>
+          <div class="table-responsive">
+            <table class="stock-ledger-table" style="font-size:0.8rem;">
+              <thead>
+                <tr>
+                  <th>Method</th>
+                  <th>System</th>
+                  <th>Ending Inventory Allocation</th>
+                  <th>COGS Allocation</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight:700; color:#38bdf8;">FIFO</td>
+                  <td>Periodic</td>
+                  <td>From LATEST purchases in period backwards</td>
+                  <td>From OLDEST purchases forwards</td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700; color:#34d399;">FIFO</td>
+                  <td>Perpetual</td>
+                  <td>Continuous queue remaining on hand</td>
+                  <td>Continuous queue oldest depleted first (Identical to Periodic!)</td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700; color:#fbbf24;">LIFO</td>
+                  <td>Periodic</td>
+                  <td>From OLDEST base purchases forwards</td>
+                  <td>From LATEST purchases in entire period backwards</td>
+                </tr>
+                <tr>
+                  <td style="font-weight:700; color:#fb7185;">LIFO</td>
+                  <td>Perpetual</td>
+                  <td>Continuous stack remaining on hand</td>
+                  <td>Most recent layer ON HAND at time of each sale</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <h4 style="font-weight:700; color:#fff; margin-bottom:0.5rem;">3. Inflationary Impact (Rising Prices)</h4>
+          <p>
+            When prices rise over time:<br>
+            • <strong>FIFO</strong> produces <strong>Lower COGS</strong>, <strong>Higher Ending Inventory</strong>, <strong>Higher Gross Profit</strong>, and <strong>Higher Income Taxes</strong>.<br>
+            • <strong>LIFO</strong> produces <strong>Higher COGS</strong>, <strong>Lower Ending Inventory</strong>, <strong>Lower Gross Profit</strong>, and <strong>Substantial Cash Tax Savings</strong> (Tax Shield).
+          </p>
+        </div>
+
+        <div>
+          <h4 style="font-weight:700; color:#fff; margin-bottom:0.5rem;">4. IFRS vs US GAAP & The LIFO Conformity Rule</h4>
+          <p>
+            • <strong>IFRS (IAS 2) STRICTLY PROHIBITS LIFO:</strong> Under IFRS, inventory must be valued at Lower of Cost and Net Realisable Value using FIFO or Weighted Average Cost. LIFO is banned because it understates balance sheet assets with stale costs.<br>
+            • <strong>US GAAP (ASC 330) PERMITS LIFO:</strong> Subject to the <strong>LIFO Conformity Rule (IRC § 472)</strong>: If a firm uses LIFO to reduce taxable income on its tax return, it MUST also use LIFO in its financial reports to shareholders.
+          </p>
+        </div>
+
+        <div>
+          <h4 style="font-weight:700; color:#fff; margin-bottom:0.5rem;">5. Double-Entry Journal Entries</h4>
+          <p>
+            • <strong>Perpetual System:</strong><br>
+            &nbsp;&nbsp;1. On Purchase: Dr Inventory, Cr Accounts Payable / Cash<br>
+            &nbsp;&nbsp;2. On Sale: Dr Accounts Receivable, Cr Sales Revenue<br>
+            &nbsp;&nbsp;3. Cost of Sale: <strong>Dr Cost of Goods Sold, Cr Inventory</strong> (Recorded simultaneously with every sale)<br>
+            • <strong>Periodic System:</strong><br>
+            &nbsp;&nbsp;1. On Purchase: Dr Purchases, Cr Accounts Payable / Cash<br>
+            &nbsp;&nbsp;2. On Sale: Dr Accounts Receivable, Cr Sales Revenue (No entry made to Inventory or COGS at point of sale)<br>
+            &nbsp;&nbsp;3. Year-End Count: Dr Ending Inventory (SOFP), Dr Cost of Goods Sold (SPL), Cr Opening Inventory, Cr Purchases
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL: AUDIT TRAIL LOGS -->
+  <!-- ============================================================ -->
+  <div id="modal-history" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">📋 Inventory Audit Trail & History Log</h3>
+        <button class="modal-close" id="modal-close-history">&times;</button>
+      </div>
+      <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
+        Complete historical ledger recording every transaction, order dispatch, and calculation performed during your sessions.
+      </p>
+      <div class="table-responsive" style="max-height:400px; overflow-y:auto;">
+        <table class="stock-ledger-table" style="font-size:0.8rem;">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Mode</th>
+              <th>Action / Event</th>
+              <th>Result</th>
+              <th>XP / Marks</th>
+            </tr>
+          </thead>
+          <tbody id="history-log-tbody">
+            <!-- Injected via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL: PROFILE & DATA MANAGEMENT SYSTEM -->
+  <!-- ============================================================ -->
+  <div id="modal-profile" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">👤 Controller Profile & Data Storage System</h3>
+        <button class="modal-close" id="modal-close-profile">&times;</button>
+      </div>
+
+      <!-- Storage Backend Status Banner -->
+      <div id="modal-storage-status-banner" style="background:#0f1c32; border:1px solid #1e3a8a; border-radius:var(--radius-sm); padding:0.85rem 1rem; margin-bottom:1.25rem;">
+        <div style="font-size:0.85rem; font-weight:700; color:#fff; display:flex; align-items:center; gap:0.5rem;">
+          <span style="font-size:1.1rem;">💾</span> Dual-Layer Data Persistence Engine
+        </div>
+        <div style="font-size:0.78rem; color:var(--text-muted); margin-top:0.25rem;" id="modal-storage-status-text">
+          Status: LocalStorage Active. Node.js REST server synchronization available.
+        </div>
+      </div>
+
+      <!-- Profile Form -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.25rem;">
+        <div class="form-group">
+          <label class="form-label">Controller Name</label>
+          <input type="text" id="prof-name" class="form-input" value="Candidate">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Enterprise / Company Name</label>
+          <input type="text" id="prof-company" class="form-input" value="Apex Supply Chain Corp">
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; margin-bottom:1.5rem;">
+        <button id="prof-btn-save-meta" class="btn btn-primary" style="padding:0.4rem 0.9rem; font-size:0.85rem;">Update Info</button>
+      </div>
+
+      <!-- Badges Showcase -->
+      <h4 style="font-size:0.95rem; font-weight:700; color:#fff; margin-bottom:0.75rem;">
+        🎖️ Inventory Valuation Badges & Achievements
+      </h4>
+      <div class="badges-grid" id="modal-badges-grid">
+        <!-- Injected via JS -->
+      </div>
+
+      <!-- Save Data Operations (Export / Import / Reset) -->
+      <div style="margin-top:1.5rem; border-top:1px solid var(--border); padding-top:1.25rem;">
+        <h4 style="font-size:0.9rem; font-weight:700; color:var(--text-muted); margin-bottom:0.75rem;">
+          Data Portability & Backup
+        </h4>
+        <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+          <button id="prof-btn-export" class="btn">
+            📥 Download JSON Save
+          </button>
+          
+          <label class="btn" style="cursor:pointer; margin:0;">
+            📤 Import Save File
+            <input type="file" id="prof-file-import" accept=".json" style="display:none;">
+          </label>
+
+          <button id="prof-btn-reset" class="btn btn-danger" style="margin-left:auto;">
+            ⚠️ Reset All Progress
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT INCLUDES -->
+  <script src="js/fifo-lifo-engine.js"></script>
+  <script src="js/fifo-lifo-data.js"></script>
+  <script src="js/fifo-lifo-storage.js"></script>
+  <script src="js/fifo-lifo-audio.js"></script>
+  <script src="js/fifo-lifo-ui.js"></script>
+</body>
+</html>

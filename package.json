@@ -1,0 +1,26 @@
+{
+  "name": "acca-financial-accounting-game",
+  "version": "1.0.0",
+  "description": "Financial Accounting Interactive Suite: ACCA FA Master and FIFO vs LIFO (Perpetual & Periodic) with Dual-Layer Data Storage.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node -e \"require('./js/fifo-lifo-engine.js'); console.log('Engine OK');\""
+  },
+  "keywords": [
+    "acca",
+    "financial-accounting",
+    "fifo",
+    "lifo",
+    "inventory-accounting",
+    "perpetual-inventory",
+    "periodic-inventory",
+    "cogs",
+    "ifrs",
+    "us-gaap",
+    "accounting-game"
+  ],
+  "author": "ACCA Scholar",
+  "license": "MIT"
+}
