@@ -131,19 +131,19 @@
         </div>
 
         <!-- Scenario Meta Banner -->
-        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:var(--radius-md); padding:1rem; margin-bottom:1.25rem;">
+        <div class="scenario-meta-box">
           <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.4rem;">
-            <h3 id="sim-scenario-title" style="font-size:1.05rem; font-weight:700; color:#fff;">Loading...</h3>
+            <h3 id="sim-scenario-title" style="font-size:1.05rem; font-weight:700; color:var(--text-main);">Loading...</h3>
             <span id="sim-scenario-trend" class="badge-tag">INFLATION</span>
           </div>
           <p id="sim-scenario-desc" style="font-size:0.85rem; color:var(--text-muted);"></p>
         </div>
 
         <!-- Interactive Stepper Timeline Controls -->
-        <div style="display:flex; justify-content:space-between; align-items:center; background:#0a0f1d; border:1px solid var(--border); border-radius:var(--radius-md); padding:0.75rem 1rem; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.75rem;">
+        <div class="stepper-controls-bar">
           <div style="display:flex; align-items:center; gap:0.5rem;">
             <button id="sim-step-prev" class="btn" style="padding:0.4rem 0.8rem;" title="Previous Transaction">◀ Prev</button>
-            <span id="sim-step-counter" style="font-size:0.85rem; font-weight:700; font-family:var(--font-mono); min-width:110px; text-align:center;">Step 1 of 6</span>
+            <span id="sim-step-counter" style="font-size:0.85rem; font-weight:700; font-family:var(--font-mono); min-width:110px; text-align:center; color:var(--text-main);">Step 1 of 6</span>
             <button id="sim-step-next" class="btn" style="padding:0.4rem 0.8rem;" title="Next Transaction">Next ▶</button>
             <button id="sim-step-auto" class="btn" style="padding:0.4rem 0.8rem;" title="Auto-Play Stepper">▶ Auto</button>
           </div>
@@ -157,12 +157,12 @@
         </div>
 
         <!-- Active Step Transaction Callout -->
-        <div id="sim-active-transaction-box" style="background:#131c2e; border-left:4px solid #38bdf8; border-radius:var(--radius-sm); padding:0.85rem 1rem; margin-bottom:1.25rem;">
+        <div id="sim-active-transaction-box" class="active-tx-box">
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span id="sim-tx-date" style="font-weight:700; color:#38bdf8; font-size:0.85rem;">2026-03-01</span>
+            <span id="sim-tx-date" style="font-weight:700; color:var(--fifo-cyan); font-size:0.85rem;">2026-03-01</span>
             <span id="sim-tx-badge" class="badge-tag">PURCHASE</span>
           </div>
-          <div id="sim-tx-text" style="font-size:1rem; font-weight:600; color:#fff; margin-top:0.3rem;">
+          <div id="sim-tx-text" style="font-size:1rem; font-weight:600; color:var(--text-main); margin-top:0.3rem;">
             Acquired 100 units @ $10.00 each. Total Cost: $1,000.00
           </div>
         </div>
@@ -171,7 +171,7 @@
         <div class="warehouse-rack-container">
           <div class="warehouse-rack-title">
             <span>🏭 Live Warehouse Shelf Stock (At Current Step)</span>
-            <span id="sim-shelf-summary" style="font-family:var(--font-mono); color:#fff;">100 Units | $1,000.00</span>
+            <span id="sim-shelf-summary" style="font-family:var(--font-mono); color:var(--text-main);">100 Units | $1,000.00</span>
           </div>
           <div id="sim-pallets-container" class="pallets-flex">
             <!-- Pallets injected dynamically -->
@@ -298,8 +298,8 @@
         </div>
 
         <!-- Key Accounting Takeaways & Reconciliation Accordion -->
-        <div style="margin-top:1.5rem; background:rgba(0,0,0,0.25); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.25rem;">
-          <h4 style="font-size:0.95rem; font-weight:700; color:#fff; margin-bottom:0.75rem; display:flex; align-items:center; gap:0.5rem;">
+        <div class="takeaways-box">
+          <h4 style="font-size:0.95rem; font-weight:700; color:var(--text-main); margin-bottom:0.75rem; display:flex; align-items:center; gap:0.5rem;">
             <span>💡</span> Key Reconciliation Takeaways for this Scenario
           </h4>
           <div id="sim-takeaways-list" style="display:flex; flex-direction:column; gap:0.5rem; font-size:0.85rem;">
@@ -344,7 +344,7 @@
         <!-- Mission Order Manifest -->
         <div class="dispatch-mission-card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:0.5rem;">
-            <h3 id="disp-mission-title" style="font-size:1.15rem; font-weight:800; color:#fff;">Mission Title</h3>
+            <h3 id="disp-mission-title" style="font-size:1.15rem; font-weight:800; color:var(--text-main);">Mission Title</h3>
             <span id="disp-mandate-badge" class="badge-tag badge-fifo-perpetual">FIFO Perpetual</span>
           </div>
 
@@ -355,11 +355,11 @@
             </div>
             <div class="order-pill">
               <span class="order-pill-label">Required Dispatch Units</span>
-              <span class="order-pill-val" id="disp-required-units" style="color:#38bdf8;">35 Units</span>
+              <span class="order-pill-val" id="disp-required-units" style="color:var(--fifo-cyan);">35 Units</span>
             </div>
             <div class="order-pill">
               <span class="order-pill-label">Selling Price / Unit</span>
-              <span class="order-pill-val" id="disp-selling-price" style="color:#34d399;">$25.00</span>
+              <span class="order-pill-val" id="disp-selling-price" style="color:var(--perpetual-emerald);">$25.00</span>
             </div>
             <div class="order-pill">
               <span class="order-pill-label">Gross Revenue</span>
@@ -368,7 +368,7 @@
           </div>
 
           <!-- Warehouse Shelves for Picking -->
-          <div class="warehouse-rack-container" style="background:rgba(0,0,0,0.4);">
+          <div class="warehouse-rack-container">
             <div class="warehouse-rack-title">
               <span>Select Batches to Load Truck (Follow the active mandate!)</span>
               <span style="color:var(--text-muted); font-size:0.75rem;">Click a batch to allocate units</span>
@@ -379,18 +379,18 @@
           </div>
 
           <!-- Loading Dock Tally & COGS Calculation -->
-          <div style="background:#0a0f1d; border:1px solid var(--border); border-radius:var(--radius-md); padding:1rem; margin-top:1.25rem;">
+          <div class="loading-dock-tally-bar">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
               <div>
                 <div style="font-size:0.8rem; color:var(--text-muted);">Current Loading Tally:</div>
-                <div style="font-size:1.2rem; font-weight:800; font-family:var(--font-mono);">
-                  <span id="disp-loaded-units" style="color:#fbbf24;">0</span> / <span id="disp-target-units">35</span> Units Loaded
+                <div style="font-size:1.2rem; font-weight:800; font-family:var(--font-mono); color:var(--text-main);">
+                  <span id="disp-loaded-units" style="color:#d97706;">0</span> / <span id="disp-target-units">35</span> Units Loaded
                 </div>
               </div>
 
               <div>
                 <div style="font-size:0.8rem; color:var(--text-muted);">Accumulated COGS:</div>
-                <div style="font-size:1.3rem; font-weight:800; font-family:var(--font-mono); color:#fb7185;">
+                <div style="font-size:1.3rem; font-weight:800; font-family:var(--font-mono); color:#dc2626;">
                   $<span id="disp-calc-cogs">0.00</span>
                 </div>
               </div>
@@ -430,17 +430,17 @@
         </div>
 
         <!-- Question Box -->
-        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.5rem; margin-bottom:1.5rem;">
+        <div class="exam-question-card">
           <div style="display:flex; justify-content:space-between; margin-bottom:0.75rem; flex-wrap:wrap; gap:0.5rem;">
-            <h3 id="exam-scenario-title" style="font-size:1.1rem; font-weight:800; color:#38bdf8;">Vanguard Trading Co.</h3>
+            <h3 id="exam-scenario-title" style="font-size:1.1rem; font-weight:800; color:var(--fifo-cyan);">Vanguard Trading Co.</h3>
             <span id="exam-method-tag" class="badge-tag">FIFO Periodic</span>
           </div>
 
-          <p id="exam-narrative" style="font-size:0.95rem; color:var(--text-main); margin-bottom:1rem; background:#0b1120; padding:1rem; border-radius:var(--radius-sm); border-left:3px solid #38bdf8; font-family:var(--font-mono);">
+          <p id="exam-narrative" class="exam-narrative-box">
             Loading narrative...
           </p>
 
-          <h4 id="exam-question-text" style="font-size:1.05rem; font-weight:700; color:#fff; margin-bottom:1.25rem;">
+          <h4 id="exam-question-text" style="font-size:1.05rem; font-weight:700; color:var(--text-main); margin-bottom:1.25rem;">
             Question prompt?
           </h4>
 
@@ -528,9 +528,9 @@
             </div>
 
             <!-- AVCO Smoothing & Tax Moderation Box -->
-            <div style="margin-top:1rem; background:rgba(0,0,0,0.3); border-radius:var(--radius-sm); padding:0.75rem; border-left:3px solid #34d399;">
+            <div class="cfo-smoothing-box">
               <div style="font-size:0.8rem; color:var(--text-muted);">AVCO Smoothing Footnote:</div>
-              <div style="font-size:1.1rem; font-weight:800; font-family:var(--font-mono); color:#34d399;" id="cfo-avco-smoothing-val">
+              <div style="font-size:1.1rem; font-weight:800; font-family:var(--font-mono); color:var(--avco-light);" id="cfo-avco-smoothing-val">
                 $0.00
               </div>
               <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;" id="cfo-tax-shield-desc">
@@ -541,8 +541,8 @@
         </div>
 
         <!-- Strategic CFO Question Prompts -->
-        <div style="background:#0c1322; border:1px solid var(--border); border-radius:var(--radius-md); padding:1.25rem;">
-          <h3 style="font-size:1.05rem; font-weight:700; color:#fff; margin-bottom:0.75rem; display:flex; align-items:center; gap:0.5rem;">
+        <div class="cfo-boardroom-box">
+          <h3 style="font-size:1.05rem; font-weight:700; color:var(--text-main); margin-bottom:0.75rem; display:flex; align-items:center; gap:0.5rem;">
             <span>💼</span> Executive Boardroom Decision Challenge (IAS 2 Standards)
           </h3>
           <p id="cfo-challenge-prompt" style="font-size:0.9rem; color:var(--text-main); margin-bottom:1rem;">
@@ -575,8 +575,8 @@
         </div>
 
         <!-- Add Transaction Form -->
-        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.25rem; margin-bottom:1.5rem;">
-          <h3 style="font-size:0.95rem; font-weight:700; color:#fff; margin-bottom:1rem;">+ Add New Inventory Transaction</h3>
+        <div class="sandbox-add-box">
+          <h3 style="font-size:0.95rem; font-weight:700; color:var(--text-main); margin-bottom:1rem;">+ Add New Inventory Transaction</h3>
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:0.75rem; align-items:flex-end;">
             <div class="form-group" style="margin:0;">
               <label class="form-label">Date</label>
@@ -611,7 +611,7 @@
         <!-- Custom Transactions Table -->
         <div style="margin-bottom:1.5rem;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
-            <h3 style="font-size:0.95rem; font-weight:700; color:#fff;">Active Custom Schedule</h3>
+            <h3 style="font-size:0.95rem; font-weight:700; color:var(--text-main);">Active Custom Schedule</h3>
             <button id="sb-btn-clear-tx" class="btn" style="padding:0.3rem 0.6rem; font-size:0.75rem;">Clear All</button>
           </div>
           <div class="table-responsive">
@@ -643,7 +643,7 @@
 
         <!-- Results Display Grid -->
         <div id="sb-results-panel" style="display:none;">
-          <h3 style="font-size:1.1rem; font-weight:800; color:#fff; margin-bottom:1rem;">
+          <h3 style="font-size:1.1rem; font-weight:800; color:var(--text-main); margin-bottom:1rem;">
             📊 Comparative Results on Your Custom Schedule
           </h3>
           <div class="comparison-grid-4" id="sb-comparison-grid">
@@ -653,7 +653,7 @@
 
         <!-- Saved Companies Slot Manager -->
         <div style="margin-top:2rem; border-top:1px solid var(--border); padding-top:1.5rem;">
-          <h3 style="font-size:1rem; font-weight:700; color:#fff; margin-bottom:1rem;">
+          <h3 style="font-size:1rem; font-weight:700; color:var(--text-main); margin-bottom:1rem;">
             💾 Stored Companies & Scenarios (From Data Persistence Engine)
           </h3>
           <div id="sb-saved-companies-list" style="display:flex; flex-direction:column; gap:0.75rem;">
@@ -675,9 +675,9 @@
         <button class="modal-close" id="modal-close-ref">&times;</button>
       </div>
       <div style="display:flex; flex-direction:column; gap:1.25rem; font-size:0.9rem; line-height:1.6;">
-        <div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem;">
-          <h4 style="font-weight:700; color:#38bdf8; margin-bottom:0.4rem;">1. Core Inventory Accounting Equation</h4>
-          <p style="font-family:var(--font-mono); color:#fff; font-size:0.85rem;">
+        <div class="modal-equation-box">
+          <h4 style="font-weight:700; color:var(--fifo-cyan); margin-bottom:0.4rem;">1. Core Inventory Accounting Equation</h4>
+          <p style="font-family:var(--font-mono); color:var(--text-main); font-size:0.85rem;">
             Beginning Inventory + Purchases = Cost of Goods Available for Sale (COGAS)<br>
             COGAS − Ending Inventory = Cost of Goods Sold (COGS)<br>
             Sales Revenue − COGS = Gross Profit
@@ -685,7 +685,7 @@
         </div>
 
         <div>
-          <h4 style="font-weight:700; color:#fff; margin-bottom:0.5rem;">2. The 4 Combinations at a Glance (IAS 2 Permitted)</h4>
+          <h4 style="font-weight:700; color:var(--text-main); margin-bottom:0.5rem;">2. The 4 Combinations at a Glance (IAS 2 Permitted)</h4>
           <div class="table-responsive">
             <table class="stock-ledger-table" style="font-size:0.8rem;">
               <thead>
@@ -698,25 +698,25 @@
               </thead>
               <tbody>
                 <tr>
-                  <td style="font-weight:700; color:#38bdf8;">FIFO</td>
+                  <td style="font-weight:700; color:#0284c7;">FIFO</td>
                   <td>Periodic</td>
                   <td>From LATEST purchases in period backwards</td>
                   <td>From OLDEST purchases forwards</td>
                 </tr>
                 <tr>
-                  <td style="font-weight:700; color:#34d399;">FIFO</td>
+                  <td style="font-weight:700; color:#059669;">FIFO</td>
                   <td>Perpetual</td>
                   <td>Continuous queue remaining on hand</td>
                   <td>Continuous queue oldest depleted first (Identical to Periodic!)</td>
                 </tr>
                 <tr>
-                  <td style="font-weight:700; color:#10b981;">AVCO</td>
+                  <td style="font-weight:700; color:#059669;">AVCO</td>
                   <td>Periodic</td>
                   <td>Ending units × Weighted Average Cost per unit</td>
                   <td>Units sold × Weighted Average Cost per unit</td>
                 </tr>
                 <tr>
-                  <td style="font-weight:700; color:#a78bfa;">AVCO</td>
+                  <td style="font-weight:700; color:#7c3aed;">AVCO</td>
                   <td>Perpetual</td>
                   <td>Ending units × Latest Moving Average rate</td>
                   <td>Each sale costed at Current Moving Average rate</td>
@@ -727,7 +727,7 @@
         </div>
 
         <div>
-          <h4 style="font-weight:700; color:#fff; margin-bottom:0.5rem;">3. Inflationary Impact (Rising Prices)</h4>
+          <h4 style="font-weight:700; color:var(--text-main); margin-bottom:0.5rem;">3. Inflationary Impact (Rising Prices)</h4>
           <p>
             When purchase costs rise over time:<br>
             • <strong>FIFO</strong> assigns older (cheaper) costs to COGS, leaving recent (higher) costs in Ending Inventory $\to$ <strong>Lower COGS, Higher Gross Profit, Higher Tax</strong>.<br>
@@ -736,7 +736,7 @@
         </div>
 
         <div>
-          <h4 style="font-weight:700; color:#fff; margin-bottom:0.5rem;">4. IFRS & IAS 2 Regulatory Compliance</h4>
+          <h4 style="font-weight:700; color:var(--text-main); margin-bottom:0.5rem;">4. IFRS & IAS 2 Regulatory Compliance</h4>
           <p>
             • <strong>IFRS (IAS 2) Standards:</strong> Only <strong>FIFO</strong> and <strong>Weighted Average Cost (AVCO)</strong> are permitted. LIFO is strictly forbidden under IAS 2 because it understates inventory carrying amounts on the Statement of Financial Position with outdated historical costs.<br>
             • Both FIFO and AVCO ensure inventories are reported at the lower of cost and net realisable value (NRV).
@@ -744,7 +744,7 @@
         </div>
 
         <div>
-          <h4 style="font-weight:700; color:#fff; margin-bottom:0.5rem;">5. Double-Entry Journal Entries</h4>
+          <h4 style="font-weight:700; color:var(--text-main); margin-bottom:0.5rem;">5. Double-Entry Journal Entries</h4>
           <p>
             • <strong>Perpetual System:</strong><br>
             &nbsp;&nbsp;1. On Purchase: Dr Inventory, Cr Accounts Payable / Cash<br>
@@ -802,8 +802,8 @@
       </div>
 
       <!-- Storage Backend Status Banner -->
-      <div id="modal-storage-status-banner" style="background:#0f1c32; border:1px solid #1e3a8a; border-radius:var(--radius-sm); padding:0.85rem 1rem; margin-bottom:1.25rem;">
-        <div style="font-size:0.85rem; font-weight:700; color:#fff; display:flex; align-items:center; gap:0.5rem;">
+      <div id="modal-storage-status-banner" class="modal-status-banner">
+        <div style="font-size:0.85rem; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:0.5rem;">
           <span style="font-size:1.1rem;">💾</span> Dual-Layer Data Persistence Engine
         </div>
         <div style="font-size:0.78rem; color:var(--text-muted); margin-top:0.25rem;" id="modal-storage-status-text">
@@ -828,7 +828,7 @@
       </div>
 
       <!-- Badges Showcase -->
-      <h4 style="font-size:0.95rem; font-weight:700; color:#fff; margin-bottom:0.75rem;">
+      <h4 style="font-size:0.95rem; font-weight:700; color:var(--text-main); margin-bottom:0.75rem;">
         🎖️ Inventory Valuation Badges & Achievements
       </h4>
       <div class="badges-grid" id="modal-badges-grid">

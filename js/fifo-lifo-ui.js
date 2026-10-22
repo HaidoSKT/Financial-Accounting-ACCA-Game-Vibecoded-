@@ -272,10 +272,11 @@
     takeList.innerHTML = '';
     fullComparison.reconciliationKeyTakeaways.forEach(tk => {
       const item = document.createElement('div');
-      item.style.padding = '0.5rem';
-      item.style.background = 'rgba(255,255,255,0.03)';
+      item.style.padding = '0.6rem 0.8rem';
+      item.style.background = 'var(--bg-card)';
+      item.style.border = '1px solid var(--border)';
       item.style.borderRadius = '6px';
-      item.innerHTML = `<strong style="color:#38bdf8;">✓ ${tk.rule}:</strong> ${tk.explanation}`;
+      item.innerHTML = `<strong style="color:var(--fifo-cyan);">✓ ${tk.rule}:</strong> <span style="color:var(--text-main);">${tk.explanation}</span>`;
       takeList.appendChild(item);
     });
 
@@ -571,7 +572,7 @@
       box.style.background = 'rgba(239, 68, 68, 0.15)';
       box.style.border = '1px solid #ef4444';
       header.textContent = '❌ Dispatch Quantity Mismatch';
-      header.style.color = '#f87171';
+      header.style.color = 'var(--danger)';
       text.textContent = `The order requires exactly ${mission.orderUnits} units, but you have loaded ${loadedUnits} units. Adjust your batch picks before shipping.`;
       Storage.awardProgress(0, 0, false, 'DISPATCHER', `Failed order quantity: ${loadedUnits}/${mission.orderUnits}`);
       updateHUD();
@@ -600,7 +601,7 @@
       box.style.background = 'rgba(16, 185, 129, 0.15)';
       box.style.border = '1px solid #10b981';
       header.textContent = '🎉 Order Successfully Dispatched & Audited!';
-      header.style.color = '#34d399';
+      header.style.color = 'var(--success)';
       text.innerHTML = `
         <strong>Excellent Execution!</strong> You followed <strong>${mission.mandateLabel}</strong> with precision.<br>
         Cost of Goods Sold (COGS) recorded: <strong>${formatMoney(accumulatedCogs)}</strong>.<br>
@@ -622,7 +623,7 @@
       box.style.background = 'rgba(239, 68, 68, 0.15)';
       box.style.border = '1px solid #ef4444';
       header.textContent = '⚠️ Accounting Allocation Violation';
-      header.style.color = '#f87171';
+      header.style.color = 'var(--danger)';
       text.innerHTML = `
         You loaded ${loadedUnits} units, but not from the correct layers required by <strong>${mission.mandateLabel}</strong>.<br>
         <strong>Hint:</strong> ${mission.hint}<br>
@@ -700,7 +701,7 @@
       box.style.background = 'rgba(16, 185, 129, 0.15)';
       box.style.border = '1px solid #10b981';
       status.textContent = '🎯 Correct Solution!';
-      status.style.color = '#34d399';
+      status.style.color = 'var(--success)';
       exp.innerHTML = `<strong>Comprehensive Accounting Breakdown:</strong><br>${q.explanation}`;
 
       const progress = Storage.awardProgress(120, 40, true, 'EXAM_ARENA', `Answered Question ${AppState.exam.questionIndex + 1}`);
@@ -719,7 +720,7 @@
       box.style.background = 'rgba(239, 68, 68, 0.15)';
       box.style.border = '1px solid #ef4444';
       status.textContent = '❌ Incorrect Calculation';
-      status.style.color = '#f87171';
+      status.style.color = 'var(--danger)';
       exp.innerHTML = `<strong>Correct Option was (${String.fromCharCode(65 + q.correctIndex)}):</strong><br>${q.explanation}`;
 
       Storage.awardProgress(0, 0, false, 'EXAM_ARENA', `Wrong answer on Question ${AppState.exam.questionIndex + 1}`);
@@ -844,7 +845,7 @@
           Audio.playSuccess();
           feedback.style.background = 'rgba(16, 185, 129, 0.15)';
           feedback.style.border = '1px solid #10b981';
-          feedback.style.color = '#34d399';
+          feedback.style.color = 'var(--success)';
           feedback.innerHTML = `<strong>Board Decision Approved!</strong> Exactly right. Under IAS 2 (Inventories), AVCO provides a stable, smoothed measure of gross margins and inventory valuation, preventing distorted earnings swings.`;
           Storage.awardProgress(150, 50, true, 'CFO_STRATEGY', 'Boardroom AVCO Decision Solved');
           Storage.unlockBadge('avco_master');
@@ -854,7 +855,7 @@
           Audio.playWrong();
           feedback.style.background = 'rgba(239, 68, 68, 0.15)';
           feedback.style.border = '1px solid #ef4444';
-          feedback.style.color = '#f87171';
+          feedback.style.color = 'var(--danger)';
           feedback.innerHTML = `<strong>Board Rejection:</strong> Review IAS 2 requirements. AVCO and FIFO are the only two permitted methods for interchangeable inventories under IFRS; AVCO smooths gross margins relative to FIFO.`;
           Storage.awardProgress(0, 0, false, 'CFO_STRATEGY', 'Incorrect Boardroom Decision');
           updateHUD();
@@ -1051,7 +1052,7 @@
 
     list.forEach(c => {
       const card = document.createElement('div');
-      card.style.background = 'rgba(255,255,255,0.03)';
+      card.style.background = 'var(--bg-card)';
       card.style.border = '1px solid var(--border)';
       card.style.borderRadius = '8px';
       card.style.padding = '0.75rem 1rem';
@@ -1060,7 +1061,7 @@
       card.style.alignItems = 'center';
       card.innerHTML = `
         <div>
-          <strong style="color:#fff;">${c.name}</strong>
+          <strong style="color:var(--text-main);">${c.name}</strong>
           <div style="font-size:0.75rem; color:var(--text-muted);">${c.transactions.length} Transactions | Created: ${new Date(c.createdAt || Date.now()).toLocaleDateString()}</div>
         </div>
         <div style="display:flex; gap:0.5rem;">
